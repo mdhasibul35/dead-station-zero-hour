@@ -6,7 +6,7 @@
 
 ## 🎮 Quick Start
 
-1. **Already Running Live:** Open your browser to **[http://localhost:3000](http://localhost:3000)**.
+1. **Already Running Live:** Open your browser to **[https://mdhasibul35.github.io/dead-station-zero-hour/])**.
 2. **One-Click Launcher:** Double-click [`run.bat`](file:///C:/Users/mdhas/.gemini/antigravity/scratch/void-protocol/run.bat) in the project directory.
 3. **Manual CLI:**
    ```bash
