@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#030508">
     <title>DEAD STATION: Zero Hour // 3D Sci-Fi Horror Thriller</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Three.js 3D Engine -->
@@ -16,7 +19,8 @@
     <div class="crt-overlay"></div>
     <div id="damage-flash"></div>
 
-    <!-- AUDIO INDICATOR & TRANSMISSION -->
+    <!-- AUDIO INDICATOR & FULLSCREEN & TRANSMISSION -->
+    <button id="btn-fullscreen-toggle" class="fullscreen-btn" title="Toggle Fullscreen">⛶ FULLSCREEN</button>
     <div id="audio-indicator">AUDIO: SYNTH ENGINE ACTIVE [M TO MUTE]</div>
     <div id="transmission-log">ESTABLISHING EMERGENCY UPLINK TO DEAD STATION...</div>
 
@@ -87,6 +91,47 @@
             <div id="helpline-icon">⚡</div>
             <div id="helpline-text">HELPLINE: [WASD] to Move & Mouse to Aim. Step on Power Terminals to restore light!</div>
         </div>
+
+        <!-- Mobile Virtual Touch Controller (Twin-Stick & Cybernetic Actions) -->
+        <div id="mobile-controls">
+            <!-- Left Thumb Movement Joystick -->
+            <div id="stick-move-zone" class="joystick-zone">
+                <div id="stick-move-base" class="joystick-base">
+                    <div class="joystick-crosshair"></div>
+                    <div id="stick-move-knob" class="joystick-knob"></div>
+                    <div class="joystick-label">MOVE</div>
+                </div>
+            </div>
+
+            <!-- Right Thumb Aim & Fire Joystick -->
+            <div id="stick-aim-zone" class="joystick-zone">
+                <div id="stick-aim-base" class="joystick-base aim-base">
+                    <div class="joystick-crosshair aim-crosshair"></div>
+                    <div id="stick-aim-knob" class="joystick-knob aim-knob"></div>
+                    <div class="joystick-label">AIM & FIRE</div>
+                </div>
+            </div>
+
+            <!-- Mobile Action Bar -->
+            <div id="mobile-action-bar">
+                <button id="btn-mob-dash" class="mob-btn btn-dash" aria-label="Dash">
+                    <span class="m-icon">⚡</span>
+                    <span class="m-lbl">DASH</span>
+                </button>
+                <button id="btn-mob-flare" class="mob-btn btn-flare" aria-label="Flare">
+                    <span class="m-icon">🔥</span>
+                    <span class="m-lbl">FLARE</span>
+                </button>
+                <button id="btn-mob-reload" class="mob-btn btn-reload" aria-label="Reload">
+                    <span class="m-icon">🔄</span>
+                    <span class="m-lbl">RELOAD</span>
+                </button>
+                <button id="btn-mob-weapon" class="mob-btn btn-weapon" aria-label="Cycle Weapon">
+                    <span class="m-icon">🔫</span>
+                    <span class="m-lbl" id="mob-weapon-text">CARBINE</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- START SCREEN -->
@@ -108,19 +153,19 @@
             <!-- Graphical Controls Badges -->
             <div class="graphic-controls-grid">
                 <div class="control-badge">
-                    <div class="key-icon">W A S D</div>
+                    <div class="key-icon">W A S D &bull; 🕹️</div>
                     <div class="key-desc">MOVE OPERATIVE</div>
                 </div>
                 <div class="control-badge">
-                    <div class="key-icon">MOUSE [LMB]</div>
+                    <div class="key-icon">MOUSE &bull; 🎯</div>
                     <div class="key-desc">AIM & FIRE</div>
                 </div>
                 <div class="control-badge">
-                    <div class="key-icon">[RMB] / [F]</div>
+                    <div class="key-icon">[RMB] [F] &bull; 🔥</div>
                     <div class="key-desc">DEPLOY FLARE</div>
                 </div>
                 <div class="control-badge">
-                    <div class="key-icon">[SHIFT]</div>
+                    <div class="key-icon">[SHIFT] &bull; ⚡</div>
                     <div class="key-desc">EVASION DASH</div>
                 </div>
             </div>
@@ -204,11 +249,10 @@
     </div>
 
     <!-- Game Scripts -->
-<!-- Game Scripts -->
-<script src="audio.js"></script>
-<script src="weapons.js"></script>
-<script src="aliens.js"></script>
-<script src="environment.js"></script>
-<script src="game.js"></script>
+    <script src="audio.js"></script>
+    <script src="weapons.js"></script>
+    <script src="aliens.js"></script>
+    <script src="environment.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>

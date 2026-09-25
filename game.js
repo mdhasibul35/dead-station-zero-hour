@@ -51,12 +51,15 @@ class Game {
         this.radarSweepAngle = 0;
         this.radarPingTimer = 0;
 
-        // Mouse & Input Tracking
+        // Mouse & Touch Tracking
         this.keys = {};
         this.mousePos = new THREE.Vector2();
         this.mouseWorld = new THREE.Vector3();
         this.raycaster = new THREE.Raycaster();
         this.groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        this.isTouchDevice = false;
+        this.joystickMove = { x: 0, y: 0, active: false };
+        this.joystickAim = { x: 0, y: 0, active: false };
 
         this.perks = {
             damageMult: 1.0,
@@ -569,15 +572,240 @@ class Game {
         });
 
         // UI Buttons
-        document.getElementById('start-btn').addEventListener('click', () => {
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                Sound.init();
+                Sound.resume();
+                this.startGame();
+            });
+            startBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                Sound.init();
+                Sound.resume();
+                this.startGame();
+            }, { passive: false });
+        }
+
+        const restartBtn = document.getElementById('restart-btn');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                this.restartGame();
+            });
+            restartBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.restartGame();
+            }, { passive: false });
+        }
+
+        // Initialize Mobile Touch System
+        this.setupMobileControls();
+    }
+
+    setupMobileControls() {
+        this.joystickMove = { x: 0, y: 0, active: false };
+        this.joystickAim = { x: 0, y: 0, active: false };
+
+        // Auto-detect touch capability or small viewport
+        this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
+        if (this.isTouchDevice) {
+            document.body.classList.add('touch-enabled');
+        }
+
+        // Global touch unlock for Web Audio
+        const unlockAudio = () => {
             Sound.init();
             Sound.resume();
-            this.startGame();
+            window.removeEventListener('touchstart', unlockAudio);
+            window.removeEventListener('touchend', unlockAudio);
+        };
+        window.addEventListener('touchstart', unlockAudio, { passive: true });
+        window.addEventListener('touchend', unlockAudio, { passive: true });
+
+        const moveZone = document.getElementById('stick-move-zone');
+        const moveBase = document.getElementById('stick-move-base');
+        const moveKnob = document.getElementById('stick-move-knob');
+
+        const aimZone = document.getElementById('stick-aim-zone');
+        const aimBase = document.getElementById('stick-aim-base');
+        const aimKnob = document.getElementById('stick-aim-knob');
+
+        let moveTouchId = null;
+        let aimTouchId = null;
+        const maxRadius = 45;
+
+        // Left Joystick - Movement
+        const handleMoveTouch = (touch) => {
+            if (!moveBase) return;
+            const rect = moveBase.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            let dx = touch.clientX - centerX;
+            let dy = touch.clientY - centerY;
+            const dist = Math.hypot(dx, dy);
+            if (dist > maxRadius) {
+                dx = (dx / dist) * maxRadius;
+                dy = (dy / dist) * maxRadius;
+            }
+            if (moveKnob) moveKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            this.joystickMove.x = dx / maxRadius;
+            this.joystickMove.y = dy / maxRadius;
+            this.joystickMove.active = dist > 6;
+        };
+
+        const resetMoveJoystick = () => {
+            if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
+            this.joystickMove.x = 0;
+            this.joystickMove.y = 0;
+            this.joystickMove.active = false;
+            moveTouchId = null;
+        };
+
+        if (moveZone) {
+            moveZone.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                Sound.init();
+                Sound.resume();
+                if (moveTouchId === null && e.changedTouches.length > 0) {
+                    const touch = e.changedTouches[0];
+                    moveTouchId = touch.identifier;
+                    handleMoveTouch(touch);
+                }
+            }, { passive: false });
+
+            moveZone.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === moveTouchId) {
+                        handleMoveTouch(e.changedTouches[i]);
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            const endMove = (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === moveTouchId) {
+                        resetMoveJoystick();
+                        break;
+                    }
+                }
+            };
+            moveZone.addEventListener('touchend', endMove, { passive: false });
+            moveZone.addEventListener('touchcancel', endMove, { passive: false });
+        }
+
+        // Right Joystick - Twin Stick Aim & Continuous Fire
+        const handleAimTouch = (touch) => {
+            if (!aimBase) return;
+            const rect = aimBase.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            let dx = touch.clientX - centerX;
+            let dy = touch.clientY - centerY;
+            const dist = Math.hypot(dx, dy);
+            if (dist > maxRadius) {
+                dx = (dx / dist) * maxRadius;
+                dy = (dy / dist) * maxRadius;
+            }
+            if (aimKnob) aimKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            this.joystickAim.x = dx / maxRadius;
+            this.joystickAim.y = dy / maxRadius;
+            this.joystickAim.active = dist > 8;
+        };
+
+        const resetAimJoystick = () => {
+            if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
+            this.joystickAim.x = 0;
+            this.joystickAim.y = 0;
+            this.joystickAim.active = false;
+            aimTouchId = null;
+        };
+
+        if (aimZone) {
+            aimZone.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                Sound.init();
+                Sound.resume();
+                if (aimTouchId === null && e.changedTouches.length > 0) {
+                    const touch = e.changedTouches[0];
+                    aimTouchId = touch.identifier;
+                    handleAimTouch(touch);
+                }
+            }, { passive: false });
+
+            aimZone.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === aimTouchId) {
+                        handleAimTouch(e.changedTouches[i]);
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            const endAim = (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === aimTouchId) {
+                        resetAimJoystick();
+                        break;
+                    }
+                }
+            };
+            aimZone.addEventListener('touchend', endAim, { passive: false });
+            aimZone.addEventListener('touchcancel', endAim, { passive: false });
+        }
+
+        // Action Buttons Binding
+        const bindTouchAction = (id, callback) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                Sound.init();
+                Sound.resume();
+                callback();
+            }, { passive: false });
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                Sound.init();
+                Sound.resume();
+                callback();
+            });
+        };
+
+        bindTouchAction('btn-mob-dash', () => this.triggerDash());
+        bindTouchAction('btn-mob-flare', () => this.throwTacticalFlare());
+        bindTouchAction('btn-mob-reload', () => this.reloadCurrentWeapon());
+        bindTouchAction('btn-mob-weapon', () => {
+            const weaponList = [WEAPONS.CARBINE, WEAPONS.SHOTGUN, WEAPONS.ARC, WEAPONS.SINGULARITY];
+            let idx = weaponList.findIndex(w => w.id === this.player.currentWeapon.id);
+            idx = (idx + 1) % weaponList.length;
+            this.switchWeapon(weaponList[idx]);
         });
 
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            this.restartGame();
-        });
+        // Fullscreen Toggle
+        const toggleFullscreen = () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                const docEl = document.documentElement;
+                if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+                else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        };
+
+        const fsBtn = document.getElementById('btn-fullscreen-toggle');
+        if (fsBtn) {
+            fsBtn.addEventListener('click', toggleFullscreen);
+            fsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                toggleFullscreen();
+            }, { passive: false });
+        }
     }
 
     switchWeapon(weapon) {
@@ -611,23 +839,29 @@ class Game {
         if (this.player.flares <= 0) return;
         this.player.flares--;
 
-        const toMouse = new THREE.Vector3().subVectors(this.mouseWorld, this.player.mesh.position);
-        toMouse.y = 0;
-        this.weaponMgr.throwFlare(this.player.mesh.position, toMouse.normalize());
+        let dir = new THREE.Vector3().subVectors(this.mouseWorld, this.player.mesh.position);
+        dir.y = 0;
+        if (dir.lengthSq() < 0.1) dir = this.player.getForwardVector();
+        this.weaponMgr.throwFlare(this.player.mesh.position, dir.normalize());
         this.updateHUD();
     }
 
     triggerDash() {
         if (this.player.dashCooldown > 0 || this.player.isDashing) return;
 
-        // Compute dash direction from movement keys, or forward
+        // Compute dash direction from movement keys, virtual joystick, or forward
         const moveVec = new THREE.Vector3();
         if (this.keys['w'] || this.keys['arrowup']) moveVec.z -= 1;
         if (this.keys['s'] || this.keys['arrowdown']) moveVec.z += 1;
         if (this.keys['a'] || this.keys['arrowleft']) moveVec.x -= 1;
         if (this.keys['d'] || this.keys['arrowright']) moveVec.x += 1;
 
-        if (moveVec.lengthSq() > 0) {
+        if (this.joystickMove && this.joystickMove.active) {
+            moveVec.x += this.joystickMove.x;
+            moveVec.z += this.joystickMove.y;
+        }
+
+        if (moveVec.lengthSq() > 0.05) {
             this.player.dashDir = moveVec.normalize();
         } else {
             this.player.dashDir = this.player.getForwardVector().normalize();
@@ -908,33 +1142,40 @@ class Game {
                 p.isDashing = false;
             }
         } else {
-            // Movement input
+            // Movement input (Keyboard + Touch Joystick)
             const move = new THREE.Vector3();
             if (this.keys['w'] || this.keys['arrowup']) move.z -= 1;
             if (this.keys['s'] || this.keys['arrowdown']) move.z += 1;
             if (this.keys['a'] || this.keys['arrowleft']) move.x -= 1;
             if (this.keys['d'] || this.keys['arrowright']) move.x += 1;
 
-            if (move.lengthSq() > 0) {
-                move.normalize();
-                const actualSpeed = p.speed * (this.perks.speedMult || 1.0);
-                const nextPos = p.mesh.position.clone().addScaledVector(move, actualSpeed * dt);
+            if (this.joystickMove && this.joystickMove.active) {
+                move.x += this.joystickMove.x;
+                move.z += this.joystickMove.y;
+            }
+
+            const moveLen = move.length();
+            if (moveLen > 0.05) {
+                const moveNorm = move.clone().divideScalar(moveLen);
+                const analogSpeed = Math.min(1.0, moveLen) * (this.perks.speedMult || 1.0);
+                const actualSpeed = p.speed * analogSpeed;
+                const nextPos = p.mesh.position.clone().addScaledVector(moveNorm, actualSpeed * dt);
 
                 // Wall Collision Check
                 if (!this.checkWallCollision(nextPos, 0.6)) {
                     p.mesh.position.copy(nextPos);
                 } else {
                     // Try sliding on X
-                    const tryX = p.mesh.position.clone().add(new THREE.Vector3(move.x * actualSpeed * dt, 0, 0));
+                    const tryX = p.mesh.position.clone().add(new THREE.Vector3(moveNorm.x * actualSpeed * dt, 0, 0));
                     if (!this.checkWallCollision(tryX, 0.6)) p.mesh.position.copy(tryX);
                     // Try sliding on Z
-                    const tryZ = p.mesh.position.clone().add(new THREE.Vector3(0, 0, move.z * actualSpeed * dt));
+                    const tryZ = p.mesh.position.clone().add(new THREE.Vector3(0, 0, moveNorm.z * actualSpeed * dt));
                     if (!this.checkWallCollision(tryZ, 0.6)) p.mesh.position.copy(tryZ);
                 }
             }
 
             // Procedural walking kinematics animation
-            const isMoving = move.lengthSq() > 0;
+            const isMoving = moveLen > 0.05;
             if (p.anim && p.bones && p.bones.leftLeg) {
                 if (isMoving) {
                     p.anim.walkCycle += dt * 14.0;
@@ -969,18 +1210,60 @@ class Game {
             p.knockback.multiplyScalar(0.85); // Damping
         }
 
-        // Raycast mouse onto ground plane to rotate player
-        this.raycaster.setFromCamera(this.mousePos, this.camera);
-        const hit = new THREE.Vector3();
-        if (this.raycaster.ray.intersectPlane(this.groundPlane, hit)) {
-            this.mouseWorld.copy(hit);
-            const toMouse = new THREE.Vector3().subVectors(hit, p.mesh.position);
-            toMouse.y = 0;
-            const rotY = Math.atan2(toMouse.x, toMouse.z);
+        // Aiming & Rotation
+        if (this.joystickAim && this.joystickAim.active) {
+            // Touch Twin-Stick Aim & Continuous Fire
+            const rotY = Math.atan2(this.joystickAim.x, this.joystickAim.y);
             p.mesh.rotation.y = rotY;
+            this.mouseWorld.set(
+                p.mesh.position.x + Math.sin(rotY) * 25,
+                0,
+                p.mesh.position.z + Math.cos(rotY) * 25
+            );
+            this.fireWeapon();
+        } else if (this.isTouchDevice) {
+            // Smart auto-target for touch devices when aim stick is released
+            let nearestAlien = null;
+            let minDistSq = 22 * 22; // 22 unit range
+            for (let a of this.alienMgr.aliens) {
+                if (!a.alive) continue;
+                const d2 = p.mesh.position.distanceToSquared(a.mesh.position);
+                if (d2 < minDistSq) {
+                    minDistSq = d2;
+                    nearestAlien = a;
+                }
+            }
+
+            if (nearestAlien) {
+                const toAlien = new THREE.Vector3().subVectors(nearestAlien.mesh.position, p.mesh.position);
+                toAlien.y = 0;
+                const rotY = Math.atan2(toAlien.x, toAlien.z);
+                p.mesh.rotation.y = THREE.MathUtils.lerp(p.mesh.rotation.y, rotY, dt * 14);
+                this.mouseWorld.copy(nearestAlien.mesh.position);
+            } else if (this.joystickMove && this.joystickMove.active) {
+                // Face movement heading
+                const rotY = Math.atan2(this.joystickMove.x, this.joystickMove.y);
+                p.mesh.rotation.y = THREE.MathUtils.lerp(p.mesh.rotation.y, rotY, dt * 10);
+                this.mouseWorld.set(
+                    p.mesh.position.x + Math.sin(rotY) * 25,
+                    0,
+                    p.mesh.position.z + Math.cos(rotY) * 25
+                );
+            }
+        } else {
+            // Desktop mouse raycasting onto ground plane
+            this.raycaster.setFromCamera(this.mousePos, this.camera);
+            const hit = new THREE.Vector3();
+            if (this.raycaster.ray.intersectPlane(this.groundPlane, hit)) {
+                this.mouseWorld.copy(hit);
+                const toMouse = new THREE.Vector3().subVectors(hit, p.mesh.position);
+                toMouse.y = 0;
+                const rotY = Math.atan2(toMouse.x, toMouse.z);
+                p.mesh.rotation.y = rotY;
+            }
         }
 
-        // Continuous firing when holding LMB
+        // Continuous firing when holding LMB on desktop
         if (this.keys['mousedown'] || this.isMouseDown) {
             this.fireWeapon();
         }
@@ -1261,6 +1544,13 @@ class Game {
         });
         const activeSlot = document.getElementById(slotMap[p.currentWeapon.id]);
         if (activeSlot) activeSlot.classList.add('active');
+
+        // Update mobile weapon swap button label
+        const mobWeapon = document.getElementById('mob-weapon-text');
+        if (mobWeapon) {
+            const shortNames = { 'CARBINE': 'CARBINE', 'SHOTGUN': 'SHOTGUN', 'ARC': 'ARC', 'SINGULARITY': 'VORTEX' };
+            mobWeapon.textContent = shortNames[p.currentWeapon.id] || p.currentWeapon.id;
+        }
     }
 
     // ------------------------------------------------------------------------

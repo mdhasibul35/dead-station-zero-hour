@@ -664,3 +664,373 @@ h1.game-title {
     color: #637d92;
     margin-top: 4px;
 }
+
+/* --------------------------------------------------------------------------
+   FULLSCREEN TOGGLE BUTTON
+   -------------------------------------------------------------------------- */
+.fullscreen-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 120;
+    pointer-events: auto;
+    padding: 6px 12px;
+    background: rgba(8, 16, 24, 0.85);
+    border: 1px solid #00d2ff;
+    color: #00d2ff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+}
+
+.fullscreen-btn:hover, .fullscreen-btn:active {
+    background: #00d2ff;
+    color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE VIRTUAL CONTROLLER & CYBERNETIC ACTION BUTTONS
+   -------------------------------------------------------------------------- */
+#mobile-controls {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 80;
+}
+
+body.touch-enabled #mobile-controls,
+@media (pointer: coarse), (max-width: 1024px) {
+    #mobile-controls {
+        display: block;
+    }
+}
+
+.joystick-zone {
+    position: absolute;
+    bottom: 20px;
+    width: 145px;
+    height: 145px;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#stick-move-zone {
+    left: 18px;
+}
+
+#stick-aim-zone {
+    right: 18px;
+}
+
+.joystick-base {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 210, 255, 0.08) 0%, rgba(6, 16, 26, 0.78) 100%);
+    border: 2px solid rgba(0, 210, 255, 0.45);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.25), inset 0 0 15px rgba(0, 210, 255, 0.15);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.joystick-crosshair {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.joystick-crosshair::before, .joystick-crosshair::after {
+    content: '';
+    position: absolute;
+    background: rgba(0, 210, 255, 0.25);
+}
+
+.joystick-crosshair::before {
+    top: 0; left: 50%; width: 1px; height: 100%; transform: translateX(-50%);
+}
+
+.joystick-crosshair::after {
+    top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%);
+}
+
+.joystick-knob {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, #00d2ff 60%, #0077aa 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 16px #00d2ff;
+    position: absolute;
+    pointer-events: none;
+    transform: translate(0px, 0px);
+    transition: transform 0.04s ease-out;
+}
+
+.joystick-label {
+    position: absolute;
+    bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(0, 210, 255, 0.75);
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* Right Aim Joystick */
+.aim-base {
+    background: radial-gradient(circle, rgba(255, 51, 102, 0.08) 0%, rgba(26, 6, 14, 0.78) 100%);
+    border-color: rgba(255, 51, 102, 0.55);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.3), inset 0 0 15px rgba(255, 51, 102, 0.15);
+}
+
+.aim-crosshair::before, .aim-crosshair::after {
+    background: rgba(255, 51, 102, 0.3);
+}
+
+.aim-knob {
+    background: radial-gradient(circle, #ffffff 0%, #ff2255 60%, #aa0022 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 18px #ff2255;
+}
+
+.aim-base .joystick-label {
+    color: rgba(255, 51, 102, 0.85);
+}
+
+/* Mobile Action Bar */
+#mobile-action-bar {
+    position: absolute;
+    bottom: 172px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.mob-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    height: 48px;
+    padding: 3px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    touch-action: manipulation;
+    transition: transform 0.1s ease, filter 0.15s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.mob-btn:active {
+    transform: scale(0.92);
+    filter: brightness(1.35);
+}
+
+.mob-btn .m-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.mob-btn .m-lbl {
+    font-size: 8px;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.btn-dash {
+    background: rgba(0, 210, 255, 0.2);
+    border: 2px solid #00d2ff;
+    color: #00d2ff;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.35);
+}
+
+.btn-flare {
+    background: rgba(255, 153, 0, 0.2);
+    border: 2px solid #ff9900;
+    color: #ff9900;
+    box-shadow: 0 0 12px rgba(255, 153, 0, 0.35);
+}
+
+.btn-reload {
+    background: rgba(57, 255, 20, 0.2);
+    border: 2px solid #39ff14;
+    color: #39ff14;
+    box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
+}
+
+.btn-weapon {
+    border-radius: 24px;
+    min-width: 76px;
+    padding: 0 10px;
+    background: rgba(204, 68, 255, 0.2);
+    border: 2px solid #cc44ff;
+    color: #cc44ff;
+    box-shadow: 0 0 12px rgba(204, 68, 255, 0.35);
+}
+
+.btn-weapon .m-lbl {
+    font-size: 9px;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN FOR SMARTPHONES & TABLETS
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px), (pointer: coarse) {
+    .radar-container {
+        top: 14px;
+        right: 14px;
+        bottom: auto;
+        left: auto;
+        transform: scale(0.72);
+        transform-origin: top right;
+    }
+
+    .hud-telemetry {
+        top: 14px;
+        right: 125px;
+        text-align: right;
+    }
+
+    .hud-vitals {
+        top: 14px;
+        left: 14px;
+        transform: scale(0.88);
+        transform-origin: top left;
+    }
+
+    .hud-weapons {
+        display: none; /* Managed by mobile action bar */
+    }
+
+    .controls-hint {
+        display: none;
+    }
+
+    #in-game-helpline {
+        top: 80px;
+        padding: 6px 14px;
+        font-size: 11px;
+        max-width: 90vw;
+    }
+
+    .fullscreen-btn {
+        top: auto;
+        bottom: 22px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        font-size: 10px;
+        padding: 5px 12px;
+        opacity: 0.85;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-box {
+        padding: 16px 14px;
+        width: 95%;
+        max-height: 94vh;
+    }
+
+    h1.game-title {
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+
+    .game-subtitle {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+    }
+
+    .helpline-sim-box {
+        padding: 6px 8px;
+        margin-bottom: 12px;
+    }
+
+    #helpline-sim-canvas {
+        max-height: 75px;
+    }
+
+    .graphic-controls-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .control-badge {
+        padding: 6px 8px;
+    }
+
+    .control-badge .key-icon {
+        font-size: 12px;
+    }
+
+    .control-badge .key-desc {
+        font-size: 9px;
+    }
+
+    .pillars-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .pillar-card {
+        padding: 8px 10px;
+    }
+
+    .threat-dossier {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .btn-primary {
+        padding: 14px 20px;
+        font-size: 16px;
+        letter-spacing: 2px;
+        width: 100%;
+    }
+
+    .upgrade-cards-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .stats-summary {
+        margin: 14px 0;
+        padding: 10px;
+    }
+
+    .stat-item .num {
+        font-size: 20px;
+    }
+}
