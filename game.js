@@ -557,6 +557,7 @@ class Game {
         });
 
         // Clickable Arsenal Slots
+        // Clickable & Touchable Arsenal Slots (4 guns on Web & Mobile)
         const slotBindings = [
             { id: 'slot-1', w: WEAPONS.CARBINE },
             { id: 'slot-2', w: WEAPONS.SHOTGUN },
@@ -566,9 +567,17 @@ class Game {
         slotBindings.forEach(b => {
             const el = document.getElementById(b.id);
             if (el) {
-                el.addEventListener('click', () => {
+                const pickSlot = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    Sound.init();
+                    Sound.resume();
                     if (this.gameState === 'PLAYING') this.switchWeapon(b.w);
-                });
+                };
+                el.addEventListener('click', pickSlot);
+                el.addEventListener('touchstart', pickSlot, { passive: false });
             }
         });
 
@@ -799,13 +808,21 @@ class Game {
             }, { passive: false });
         }
 
-        // Tactical Help Popup Toggle & Dismiss
+        // Tactical Help Popup: Pause during reading & 3-2-1 Countdown on close
         const helpPopup = document.getElementById('help-popup');
         const openHelp = () => {
+            if (this.gameState === 'PLAYING') {
+                this.wasPlayingBeforeHelp = true;
+                this.gameState = 'PAUSED';
+            }
             if (helpPopup) helpPopup.style.display = 'flex';
         };
         const closeHelp = () => {
             if (helpPopup) helpPopup.style.display = 'none';
+            if (this.wasPlayingBeforeHelp) {
+                this.wasPlayingBeforeHelp = false;
+                this.startResumeCountdown();
+            }
         };
 
         const helpBtn = document.getElementById('btn-help-toggle');
@@ -825,6 +842,47 @@ class Game {
             dismissBtn.addEventListener('click', closeHelp);
             dismissBtn.addEventListener('touchstart', (e) => { e.preventDefault(); closeHelp(); }, { passive: false });
         }
+    }
+
+    startResumeCountdown() {
+        const overlay = document.getElementById('countdown-overlay');
+        const numElem = document.getElementById('countdown-number');
+        if (!overlay || !numElem) {
+            this.lastTime = performance.now();
+            this.gameState = 'PLAYING';
+            return;
+        }
+
+        overlay.style.display = 'flex';
+        let count = 3;
+        numElem.textContent = count;
+        numElem.style.color = '#00ffff';
+        Sound.playCountdownTick(false);
+
+        if (this.countdownTimer) clearInterval(this.countdownTimer);
+        this.countdownTimer = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numElem.textContent = count;
+                numElem.style.animation = 'none';
+                numElem.offsetHeight;
+                numElem.style.animation = null;
+                Sound.playCountdownTick(false);
+            } else if (count === 0) {
+                numElem.textContent = 'ENGAGE!';
+                numElem.style.color = '#00ffaa';
+                numElem.style.animation = 'none';
+                numElem.offsetHeight;
+                numElem.style.animation = null;
+                Sound.playCountdownTick(true);
+            } else {
+                clearInterval(this.countdownTimer);
+                this.countdownTimer = null;
+                overlay.style.display = 'none';
+                this.lastTime = performance.now();
+                this.gameState = 'PLAYING';
+            }
+        }, 850);
     }
 
     switchWeapon(weapon) {

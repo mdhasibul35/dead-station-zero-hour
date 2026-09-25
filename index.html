@@ -113,8 +113,8 @@
                 <button id="btn-mob-reload" class="mob-btn btn-reload round-btn" aria-label="Reload" title="Reload Weapon">
                     <span class="m-icon">🔄</span>
                 </button>
-                <!-- ROUND WEAPON CHANGER: Takes very little space on phone, purely visual -->
-                <button id="btn-mob-weapon" class="mob-btn btn-round-weapon" aria-label="Cycle Weapon" title="Cycle Weapon">
+                <!-- Single weapon changer hidden because the 4 round gun buttons are now visible on mobile -->
+                <button id="btn-mob-weapon" class="mob-btn btn-round-weapon" aria-label="Cycle Weapon" title="Cycle Weapon" style="display: none;">
                     <span class="m-icon" id="mob-weapon-icon">🔫</span>
                 </button>
             </div>
@@ -155,10 +155,10 @@
                 </div>
 
                 <div class="help-card">
-                    <span class="h-icon">🔄</span>
+                    <span class="h-icon">🎯</span>
                     <div>
-                        <div class="h-title">ROUND WEAPON DIAL</div>
-                        <div class="h-desc">Tap the circular weapon button to cycle: <strong>🔫 Carbine &bull; 💥 Shotgun &bull; ⚡ Arc &bull; 🌀 Vortex</strong>.</div>
+                        <div class="h-title">4 WEAPON ARSENAL</div>
+                        <div class="h-desc">Tap any round button: <strong>🔫 [1] Carbine &bull; 💥 [2] Shotgun &bull; ⚡ [3] Arc &bull; 🌀 [4] Vortex</strong>.</div>
                     </div>
                 </div>
 
@@ -172,6 +172,14 @@
             </div>
 
             <button id="btn-dismiss-help" class="btn-primary" style="margin-top: 14px; padding: 12px 24px; font-size: 15px;">✕ CLOSE & RESUME GAME</button>
+        </div>
+    </div>
+
+    <!-- RESUME 3-2-1 COUNTDOWN OVERLAY -->
+    <div id="countdown-overlay" style="display: none;">
+        <div id="countdown-box">
+            <div id="countdown-number">3</div>
+            <div id="countdown-sub">TACTICAL ENGAGEMENT RESUMING...</div>
         </div>
     </div>
 

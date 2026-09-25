@@ -607,6 +607,31 @@ class SoundManager {
             osc.stop(now + offset + 0.3);
         }
     }
+
+    playCountdownTick(isFinal = false) {
+        if (!this.initialized || this.isMuted) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = isFinal ? 'triangle' : 'sine';
+            const freq = isFinal ? 960 : 520;
+            osc.frequency.setValueAtTime(freq, now);
+            if (isFinal) {
+                osc.frequency.exponentialRampToValueAtTime(1440, now + 0.18);
+            }
+
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + (isFinal ? 0.35 : 0.16));
+
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+
+            osc.start(now);
+            osc.stop(now + (isFinal ? 0.35 : 0.16));
+        } catch (e) {}
+    }
 }
 
 // Global Sound Instance
