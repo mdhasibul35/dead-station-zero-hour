@@ -528,6 +528,10 @@ class Game {
             Sound.resume();
 
             if (this.gameState !== 'PLAYING') return;
+            if (this.isTouchDevice) {
+                this.isMouseDown = false;
+                return;
+            }
 
             if (e.button === 0) {
                 // Left Click: Shoot
@@ -542,6 +546,17 @@ class Game {
 
         window.addEventListener('mouseup', (e) => {
             if (e.button === 0) this.isMouseDown = false;
+        });
+
+        window.addEventListener('blur', () => {
+            this.isMouseDown = false;
+            if (this.joystickMove) this.joystickMove.active = false;
+            if (this.joystickAim) this.joystickAim.active = false;
+            for (let k in this.keys) this.keys[k] = false;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            this.isMouseDown = false;
         });
 
         window.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -648,12 +663,25 @@ class Game {
 
         // Dynamic Full-Screen Touch Handling
         window.addEventListener('touchstart', (e) => {
+            this.isTouchDevice = true;
+            this.isMouseDown = false;
             if (this.gameState !== 'PLAYING') return;
 
             for (let i = 0; i < e.changedTouches.length; i++) {
                 const touch = e.changedTouches[i];
                 const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (target && (target.closest('.mob-btn') || target.closest('.fullscreen-btn'))) {
+                if (target && (
+                    target.closest('.mob-btn') || 
+                    target.closest('.round-slot') || 
+                    target.closest('.hud-weapons') || 
+                    target.closest('.hud-top-btn') || 
+                    target.closest('.hud-top-buttons') || 
+                    target.closest('.hud-vitals') || 
+                    target.closest('.radar-container') || 
+                    target.closest('.fullscreen-btn') || 
+                    target.closest('#help-popup') || 
+                    target.closest('#countdown-overlay')
+                )) {
                     continue;
                 }
 
@@ -724,6 +752,7 @@ class Game {
         }, { passive: false });
 
         const endTouch = (e) => {
+            this.isMouseDown = false;
             for (let i = 0; i < e.changedTouches.length; i++) {
                 const touch = e.changedTouches[i];
                 if (touch.identifier === moveTouchId) {
@@ -750,6 +779,32 @@ class Game {
                         aimBase.style.top = '';
                         aimBase.style.opacity = '';
                     }
+                }
+            }
+
+            // Universal Failsafe: if no fingers on screen, immediately stop all sticks and firing
+            if (!e.touches || e.touches.length === 0) {
+                moveTouchId = null;
+                aimTouchId = null;
+                this.joystickMove.x = 0;
+                this.joystickMove.y = 0;
+                this.joystickMove.active = false;
+                this.joystickAim.x = 0;
+                this.joystickAim.y = 0;
+                this.joystickAim.active = false;
+                if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
+                if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
+                if (moveBase) {
+                    moveBase.style.position = '';
+                    moveBase.style.left = '';
+                    moveBase.style.top = '';
+                    moveBase.style.opacity = '';
+                }
+                if (aimBase) {
+                    aimBase.style.position = '';
+                    aimBase.style.left = '';
+                    aimBase.style.top = '';
+                    aimBase.style.opacity = '';
                 }
             }
         };
@@ -892,12 +947,22 @@ class Game {
     }
 
     reloadCurrentWeapon() {
-        this.player.ammo[this.player.currentWeapon.id] = this.player.currentWeapon.ammoCapacity;
+        const p = this.player;
+        const maxCap = p.currentWeapon.ammoCapacity;
+        if (p.ammo[p.currentWeapon.id] >= maxCap) return; // already full
+
+        p.ammo[p.currentWeapon.id] = maxCap;
         Sound.playUpgradeSelect();
         this.updateHUD();
     }
 
     fireWeapon() {
+        const p = this.player;
+        if (p.ammo[p.currentWeapon.id] <= 0) {
+            // Out of ammo: stop firing immediately until player reloads with [R] or reload button!
+            return;
+        }
+
         const recoil = this.weaponMgr.fire(
             this.player,
             this.player.currentWeapon,
@@ -1331,8 +1396,8 @@ class Game {
             }
         }
 
-        // Continuous firing when holding LMB on desktop
-        if (this.keys['mousedown'] || this.isMouseDown) {
+        // Continuous firing ONLY on desktop when actively holding LMB (never on touch devices)
+        if (!this.isTouchDevice && this.isMouseDown) {
             this.fireWeapon();
         }
     }
