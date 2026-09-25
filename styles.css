@@ -952,72 +952,76 @@ body.touch-enabled #mobile-controls,
     }
 }
 
+.mobile-touch-banner {
+    display: none;
+    background: rgba(0, 210, 255, 0.12);
+    border: 1px solid #00d2ff;
+    color: #00ffff;
+    padding: 8px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
+}
+
+body.touch-enabled .mobile-touch-banner,
+@media (max-width: 768px), (pointer: coarse) {
+    .mobile-touch-banner {
+        display: block;
+    }
+}
+
 @media (max-width: 768px) {
     .modal-box {
-        padding: 16px 14px;
-        width: 95%;
+        padding: 18px 16px;
+        width: 92%;
         max-height: 94vh;
     }
 
     h1.game-title {
-        font-size: 24px;
+        font-size: 26px;
         letter-spacing: 2px;
     }
 
     .game-subtitle {
         font-size: 10px;
         letter-spacing: 1.5px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
-    .helpline-sim-box {
-        padding: 6px 8px;
-        margin-bottom: 12px;
-    }
-
-    #helpline-sim-canvas {
-        max-height: 75px;
+    /* Hide heavy text blocks on mobile screens so START button is immediately visible */
+    .helpline-sim-box,
+    .pillars-row,
+    .threat-dossier {
+        display: none !important;
     }
 
     .graphic-controls-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
-        margin-bottom: 14px;
+        margin-bottom: 18px;
     }
 
     .control-badge {
-        padding: 6px 8px;
+        padding: 10px 8px;
     }
 
     .control-badge .key-icon {
-        font-size: 12px;
+        font-size: 13px;
+        color: #00ffff;
     }
 
     .control-badge .key-desc {
         font-size: 9px;
     }
 
-    .pillars-row {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        margin-bottom: 14px;
-    }
-
-    .pillar-card {
-        padding: 8px 10px;
-    }
-
-    .threat-dossier {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        margin-bottom: 14px;
-    }
-
     .btn-primary {
-        padding: 14px 20px;
-        font-size: 16px;
+        padding: 16px 20px;
+        font-size: 18px;
         letter-spacing: 2px;
         width: 100%;
+        box-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
     }
 
     .upgrade-cards-container {

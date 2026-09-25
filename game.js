@@ -13,10 +13,11 @@ class Game {
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.FogExp2(0x0d1724, 0.021); // Crisp sci-fi atmospheric mist with high visibility
 
+        this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.setPixelRatio(this.isTouchDevice ? 1.0 : Math.min(window.devicePixelRatio, 2));
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.canvasContainer.appendChild(this.renderer.domElement);
@@ -632,129 +633,120 @@ class Game {
 
         let moveTouchId = null;
         let aimTouchId = null;
+        let moveCenter = { x: 0, y: 0 };
+        let aimCenter = { x: 0, y: 0 };
         const maxRadius = 45;
 
-        // Left Joystick - Movement
-        const handleMoveTouch = (touch) => {
-            if (!moveBase) return;
-            const rect = moveBase.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            let dx = touch.clientX - centerX;
-            let dy = touch.clientY - centerY;
-            const dist = Math.hypot(dx, dy);
-            if (dist > maxRadius) {
-                dx = (dx / dist) * maxRadius;
-                dy = (dy / dist) * maxRadius;
+        // Dynamic Full-Screen Touch Handling
+        window.addEventListener('touchstart', (e) => {
+            if (this.gameState !== 'PLAYING') return;
+
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (target && (target.closest('.mob-btn') || target.closest('.fullscreen-btn'))) {
+                    continue;
+                }
+
+                // Left Half: Movement
+                if (touch.clientX < window.innerWidth * 0.5) {
+                    if (moveTouchId === null) {
+                        moveTouchId = touch.identifier;
+                        moveCenter = { x: touch.clientX, y: touch.clientY };
+                        if (moveBase) {
+                            moveBase.style.position = 'fixed';
+                            moveBase.style.left = (touch.clientX - 66) + 'px';
+                            moveBase.style.top = (touch.clientY - 66) + 'px';
+                            moveBase.style.opacity = '1';
+                        }
+                        if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
+                    }
+                }
+                // Right Half: Aim & Fire
+                else {
+                    if (aimTouchId === null) {
+                        aimTouchId = touch.identifier;
+                        aimCenter = { x: touch.clientX, y: touch.clientY };
+                        if (aimBase) {
+                            aimBase.style.position = 'fixed';
+                            aimBase.style.left = (touch.clientX - 66) + 'px';
+                            aimBase.style.top = (touch.clientY - 66) + 'px';
+                            aimBase.style.opacity = '1';
+                        }
+                        if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
+                    }
+                }
             }
-            if (moveKnob) moveKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            this.joystickMove.x = dx / maxRadius;
-            this.joystickMove.y = dy / maxRadius;
-            this.joystickMove.active = dist > 6;
-        };
+        }, { passive: false });
 
-        const resetMoveJoystick = () => {
-            if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
-            this.joystickMove.x = 0;
-            this.joystickMove.y = 0;
-            this.joystickMove.active = false;
-            moveTouchId = null;
-        };
+        window.addEventListener('touchmove', (e) => {
+            if (this.gameState !== 'PLAYING') return;
 
-        if (moveZone) {
-            moveZone.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                Sound.init();
-                Sound.resume();
-                if (moveTouchId === null && e.changedTouches.length > 0) {
-                    const touch = e.changedTouches[0];
-                    moveTouchId = touch.identifier;
-                    handleMoveTouch(touch);
-                }
-            }, { passive: false });
-
-            moveZone.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === moveTouchId) {
-                        handleMoveTouch(e.changedTouches[i]);
-                        break;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.identifier === moveTouchId) {
+                    e.preventDefault();
+                    let dx = touch.clientX - moveCenter.x;
+                    let dy = touch.clientY - moveCenter.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > maxRadius) {
+                        dx = (dx / dist) * maxRadius;
+                        dy = (dy / dist) * maxRadius;
                     }
-                }
-            }, { passive: false });
-
-            const endMove = (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === moveTouchId) {
-                        resetMoveJoystick();
-                        break;
+                    if (moveKnob) moveKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+                    this.joystickMove.x = dx / maxRadius;
+                    this.joystickMove.y = dy / maxRadius;
+                    this.joystickMove.active = dist > 5;
+                } else if (touch.identifier === aimTouchId) {
+                    e.preventDefault();
+                    let dx = touch.clientX - aimCenter.x;
+                    let dy = touch.clientY - aimCenter.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > maxRadius) {
+                        dx = (dx / dist) * maxRadius;
+                        dy = (dy / dist) * maxRadius;
                     }
+                    if (aimKnob) aimKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+                    this.joystickAim.x = dx / maxRadius;
+                    this.joystickAim.y = dy / maxRadius;
+                    this.joystickAim.active = dist > 6;
                 }
-            };
-            moveZone.addEventListener('touchend', endMove, { passive: false });
-            moveZone.addEventListener('touchcancel', endMove, { passive: false });
-        }
-
-        // Right Joystick - Twin Stick Aim & Continuous Fire
-        const handleAimTouch = (touch) => {
-            if (!aimBase) return;
-            const rect = aimBase.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            let dx = touch.clientX - centerX;
-            let dy = touch.clientY - centerY;
-            const dist = Math.hypot(dx, dy);
-            if (dist > maxRadius) {
-                dx = (dx / dist) * maxRadius;
-                dy = (dy / dist) * maxRadius;
             }
-            if (aimKnob) aimKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            this.joystickAim.x = dx / maxRadius;
-            this.joystickAim.y = dy / maxRadius;
-            this.joystickAim.active = dist > 8;
-        };
+        }, { passive: false });
 
-        const resetAimJoystick = () => {
-            if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
-            this.joystickAim.x = 0;
-            this.joystickAim.y = 0;
-            this.joystickAim.active = false;
-            aimTouchId = null;
-        };
-
-        if (aimZone) {
-            aimZone.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                Sound.init();
-                Sound.resume();
-                if (aimTouchId === null && e.changedTouches.length > 0) {
-                    const touch = e.changedTouches[0];
-                    aimTouchId = touch.identifier;
-                    handleAimTouch(touch);
-                }
-            }, { passive: false });
-
-            aimZone.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === aimTouchId) {
-                        handleAimTouch(e.changedTouches[i]);
-                        break;
+        const endTouch = (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.identifier === moveTouchId) {
+                    moveTouchId = null;
+                    this.joystickMove.x = 0;
+                    this.joystickMove.y = 0;
+                    this.joystickMove.active = false;
+                    if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
+                    if (moveBase) {
+                        moveBase.style.position = '';
+                        moveBase.style.left = '';
+                        moveBase.style.top = '';
+                        moveBase.style.opacity = '';
+                    }
+                } else if (touch.identifier === aimTouchId) {
+                    aimTouchId = null;
+                    this.joystickAim.x = 0;
+                    this.joystickAim.y = 0;
+                    this.joystickAim.active = false;
+                    if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
+                    if (aimBase) {
+                        aimBase.style.position = '';
+                        aimBase.style.left = '';
+                        aimBase.style.top = '';
+                        aimBase.style.opacity = '';
                     }
                 }
-            }, { passive: false });
+            }
+        };
 
-            const endAim = (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === aimTouchId) {
-                        resetAimJoystick();
-                        break;
-                    }
-                }
-            };
-            aimZone.addEventListener('touchend', endAim, { passive: false });
-            aimZone.addEventListener('touchcancel', endAim, { passive: false });
-        }
+        window.addEventListener('touchend', endTouch, { passive: true });
+        window.addEventListener('touchcancel', endTouch, { passive: true });
 
         // Action Buttons Binding
         const bindTouchAction = (id, callback) => {
