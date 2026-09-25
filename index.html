@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <!-- Mobile Virtual Touch Controller (Twin-Stick & Minimalist Action Buttons) -->
+        <!-- Mobile Virtual Touch Controller -->
         <div id="mobile-controls">
             <!-- Left Thumb Movement Joystick -->
             <div id="stick-move-zone" class="joystick-zone">
@@ -93,30 +93,23 @@
                 </div>
             </div>
 
-            <!-- Right Thumb Aim & Fire Joystick -->
-            <div id="stick-aim-zone" class="joystick-zone">
-                <div id="stick-aim-base" class="joystick-base aim-base">
-                    <div class="joystick-crosshair aim-crosshair"></div>
-                    <div id="stick-aim-knob" class="joystick-knob aim-knob"></div>
-                    <div class="joystick-label">AIM & FIRE</div>
-                </div>
-            </div>
-
-            <!-- Mobile Action Bar: Round Minimalist Buttons -->
+            <!-- Mobile Action Bar: Dedicated Combat Buttons -->
             <div id="mobile-action-bar">
                 <button id="btn-mob-dash" class="mob-btn btn-dash round-btn" aria-label="Dash" title="Dash Evade">
                     <span class="m-icon">⚡</span>
+                    <span class="m-lbl">DASH</span>
                 </button>
                 <button id="btn-mob-flare" class="mob-btn btn-flare round-btn" aria-label="Flare" title="Deploy Flare">
                     <span class="m-icon">🔥</span>
+                    <span class="m-lbl">FLARE</span>
                 </button>
                 <button id="btn-mob-reload" class="mob-btn btn-reload round-btn" aria-label="Reload" title="Reload Weapon [R]">
                     <span class="m-icon">🔄</span>
-                    <span class="m-key-badge">R</span>
+                    <span class="m-lbl">RELOAD</span>
                 </button>
-                <!-- Single weapon changer hidden because the 4 round gun buttons are now visible on mobile -->
-                <button id="btn-mob-weapon" class="mob-btn btn-round-weapon" aria-label="Cycle Weapon" title="Cycle Weapon" style="display: none;">
-                    <span class="m-icon" id="mob-weapon-icon">🔫</span>
+                <button id="btn-mob-fire" class="mob-btn btn-fire" aria-label="Fire" title="Fire Weapon">
+                    <span class="m-icon">🎯</span>
+                    <span class="m-lbl">FIRE</span>
                 </button>
             </div>
         </div>

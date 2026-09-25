@@ -850,10 +850,13 @@ h1.game-title {
     z-index: 80;
 }
 
-body.touch-enabled #mobile-controls,
+body.touch-enabled #mobile-controls {
+    display: block !important;
+}
+
 @media (pointer: coarse), (max-width: 1024px) {
     #mobile-controls {
-        display: block;
+        display: block !important;
     }
 }
 
@@ -1025,26 +1028,76 @@ body.touch-enabled #mobile-controls,
 }
 
 .btn-reload {
-    background: rgba(57, 255, 20, 0.2);
+    background: rgba(10, 28, 16, 0.9);
     border: 2px solid #39ff14;
     color: #39ff14;
-    box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
-    position: relative;
+    box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
 }
 
 .btn-reload .m-icon {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1;
 }
 
-.btn-reload .m-key-badge {
+.btn-reload .m-lbl {
     font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    font-weight: 900;
-    color: #ffffff;
-    text-shadow: 0 0 6px #39ff14;
-    line-height: 1;
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #39ff14;
     margin-top: 1px;
+}
+
+.btn-dash .m-lbl {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    font-weight: bold;
+    color: #00d2ff;
+    margin-top: 1px;
+}
+
+.btn-flare .m-lbl {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    font-weight: bold;
+    color: #ff9900;
+    margin-top: 1px;
+}
+
+/* Primary FIRE Button on Mobile */
+.btn-fire {
+    width: 62px;
+    height: 62px;
+    min-width: 62px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff2255 0%, #cc0033 60%, #880022 100%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 20px #ff2255, inset 0 0 10px rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.08s ease, filter 0.1s ease;
+}
+
+.btn-fire .m-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.btn-fire .m-lbl {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    text-shadow: 0 0 6px #ffffff;
+    margin-top: 2px;
+}
+
+.btn-fire:active, .btn-fire.firing {
+    transform: scale(0.92);
+    box-shadow: 0 0 32px #ff0044, inset 0 0 14px #ffffff;
+    filter: brightness(1.3);
 }
 
 /* ROUND WEAPON CHANGER: Takes very little space, purely visual icon with glowing border */
@@ -1244,8 +1297,8 @@ body.touch-enabled #mobile-controls,
     }
 
     #mobile-action-bar {
-        bottom: 165px;
-        right: 14px;
+        bottom: 18px;
+        right: 18px;
         gap: 8px;
     }
 
@@ -1254,7 +1307,7 @@ body.touch-enabled #mobile-controls,
     }
 }
 
-/* Optimized for phone portrait orientation: 4 guns above left stick, actions above right stick */
+/* Optimized for phone portrait orientation: 4 guns above left stick, actions in 2x2 grid at bottom right */
 @media (max-width: 600px) and (orientation: portrait) {
     .hud-weapons {
         bottom: 170px;
@@ -1274,15 +1327,24 @@ body.touch-enabled #mobile-controls,
     }
 
     #mobile-action-bar {
-        bottom: 170px;
+        bottom: 18px;
         right: 14px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 6px;
+        max-width: 120px;
     }
 
     .round-btn {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+    }
+
+    .btn-fire {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
     }
 
     .round-btn .m-icon {
