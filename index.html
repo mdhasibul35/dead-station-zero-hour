@@ -19,14 +19,9 @@
     <div class="crt-overlay"></div>
     <div id="damage-flash"></div>
 
-    <!-- AUDIO INDICATOR & FULLSCREEN & TRANSMISSION -->
-    <button id="btn-fullscreen-toggle" class="fullscreen-btn" title="Toggle Fullscreen">⛶ FULLSCREEN</button>
-    <div id="audio-indicator">AUDIO: SYNTH ENGINE ACTIVE [M TO MUTE]</div>
-    <div id="transmission-log">ESTABLISHING EMERGENCY UPLINK TO DEAD STATION...</div>
-
     <!-- HUD INTERFACE -->
     <div id="hud">
-        <!-- Vitals -->
+        <!-- Vitals Box (Exact visual requested by user) -->
         <div class="hud-vitals">
             <div class="vital-label">
                 <span>OPERATIVE VITALS</span>
@@ -36,13 +31,13 @@
                 <div id="health-bar"></div>
             </div>
             <div class="vital-stats">
-                <div>WEAPON: <span id="weapon-name">MK-IV CARBINE</span></div>
+                <div>WEAPON: <span id="weapon-name">MK-IV Pulse Carbine</span></div>
                 <div>ROUNDS: <span id="ammo-val">30 / 30</span></div>
                 <div>FLARES: <span id="flare-count">4</span></div>
             </div>
         </div>
 
-        <!-- Telemetry -->
+        <!-- Telemetry: Condition & Score -->
         <div class="hud-telemetry">
             <div class="telemetry-row">
                 SCORE <span class="telemetry-val" id="score-val">0</span>
@@ -55,44 +50,39 @@
             </div>
         </div>
 
+        <!-- Top Right Utility Buttons -->
+        <div class="hud-top-buttons">
+            <button id="btn-help-toggle" class="hud-top-btn" title="Open Help Guide">? HELP</button>
+            <button id="btn-fullscreen-toggle" class="hud-top-btn" title="Toggle Fullscreen">⛶ FULLSCREEN</button>
+        </div>
+
         <!-- Motion Tracker Radar -->
         <div class="radar-container">
             <canvas id="radar-canvas" width="130" height="130"></canvas>
             <div class="radar-label">BIOMETRIC TRACKER</div>
         </div>
 
-        <!-- Arsenal Hotbar -->
-        <div class="hud-weapons">
-            <div class="weapon-slot active" id="slot-1">
-                <span class="key">[1]</span>
-                <span class="w-name">CARBINE</span>
+        <!-- Desktop Arsenal Hotbar (Round Visual Buttons) -->
+        <div class="hud-weapons round-arsenal">
+            <div class="round-slot active" id="slot-1" title="Carbine [1]">
+                <span class="w-icon">🔫</span>
+                <span class="w-num">1</span>
             </div>
-            <div class="weapon-slot" id="slot-2">
-                <span class="key">[2]</span>
-                <span class="w-name">SHOTGUN</span>
+            <div class="round-slot" id="slot-2" title="Shotgun [2]">
+                <span class="w-icon">💥</span>
+                <span class="w-num">2</span>
             </div>
-            <div class="weapon-slot" id="slot-3">
-                <span class="key">[3]</span>
-                <span class="w-name">ARC EMITTER</span>
+            <div class="round-slot" id="slot-3" title="Arc Emitter [3]">
+                <span class="w-icon">⚡</span>
+                <span class="w-num">3</span>
             </div>
-            <div class="weapon-slot" id="slot-4">
-                <span class="key">[4]</span>
-                <span class="w-name">VORTEX</span>
+            <div class="round-slot" id="slot-4" title="Vortex [4]">
+                <span class="w-icon">🌀</span>
+                <span class="w-num">4</span>
             </div>
         </div>
 
-        <!-- Controls Reminder -->
-        <div class="controls-hint">
-            [WASD] MOVE &nbsp;|&nbsp; [MOUSE] AIM & FIRE &nbsp;|&nbsp; [SHIFT/SPACE] DASH &nbsp;|&nbsp; [RMB / F] FLARE &nbsp;|&nbsp; [1-4] WEAPONS &nbsp;|&nbsp; [R] RELOAD
-        </div>
-
-        <!-- In-Game Dynamic Animated Helpline Banner -->
-        <div id="in-game-helpline">
-            <div id="helpline-icon">⚡</div>
-            <div id="helpline-text">HELPLINE: [WASD] to Move & Mouse to Aim. Step on Power Terminals to restore light!</div>
-        </div>
-
-        <!-- Mobile Virtual Touch Controller (Twin-Stick & Cybernetic Actions) -->
+        <!-- Mobile Virtual Touch Controller (Twin-Stick & Minimalist Action Buttons) -->
         <div id="mobile-controls">
             <!-- Left Thumb Movement Joystick -->
             <div id="stick-move-zone" class="joystick-zone">
@@ -112,25 +102,76 @@
                 </div>
             </div>
 
-            <!-- Mobile Action Bar -->
+            <!-- Mobile Action Bar: Round Minimalist Buttons -->
             <div id="mobile-action-bar">
-                <button id="btn-mob-dash" class="mob-btn btn-dash" aria-label="Dash">
+                <button id="btn-mob-dash" class="mob-btn btn-dash round-btn" aria-label="Dash" title="Dash Evade">
                     <span class="m-icon">⚡</span>
-                    <span class="m-lbl">DASH</span>
                 </button>
-                <button id="btn-mob-flare" class="mob-btn btn-flare" aria-label="Flare">
+                <button id="btn-mob-flare" class="mob-btn btn-flare round-btn" aria-label="Flare" title="Deploy Flare">
                     <span class="m-icon">🔥</span>
-                    <span class="m-lbl">FLARE</span>
                 </button>
-                <button id="btn-mob-reload" class="mob-btn btn-reload" aria-label="Reload">
+                <button id="btn-mob-reload" class="mob-btn btn-reload round-btn" aria-label="Reload" title="Reload Weapon">
                     <span class="m-icon">🔄</span>
-                    <span class="m-lbl">RELOAD</span>
                 </button>
-                <button id="btn-mob-weapon" class="mob-btn btn-weapon" aria-label="Cycle Weapon">
-                    <span class="m-icon">🔫</span>
-                    <span class="m-lbl" id="mob-weapon-text">CARBINE</span>
+                <!-- ROUND WEAPON CHANGER: Takes very little space on phone, purely visual -->
+                <button id="btn-mob-weapon" class="mob-btn btn-round-weapon" aria-label="Cycle Weapon" title="Cycle Weapon">
+                    <span class="m-icon" id="mob-weapon-icon">🔫</span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- TACTICAL MANUAL POP-UP (DISMISSIBLE / DELETABLE) -->
+    <div id="help-popup" class="modal-overlay" style="display: none;">
+        <div class="modal-box help-popup-box">
+            <div class="help-popup-header">
+                <span class="help-title">TACTICAL SURVIVAL BRIEFING</span>
+                <button id="btn-close-help" class="btn-close-popup" title="Close Help">✕</button>
+            </div>
+            
+            <div class="help-popup-content">
+                <div class="help-card">
+                    <span class="h-icon">🕹️</span>
+                    <div>
+                        <div class="h-title">MOVEMENT & COMBAT</div>
+                        <div class="h-desc"><strong>Mobile:</strong> Touch left half to run, drag right half to aim & shoot.<br><strong>PC:</strong> [WASD] to move operative, Mouse to aim & shoot.</div>
+                    </div>
+                </div>
+
+                <div class="help-card">
+                    <span class="h-icon">⚡</span>
+                    <div>
+                        <div class="h-title">POWER RESTORATION</div>
+                        <div class="h-desc">Step onto yellow glowing floor consoles around the outpost to reboot massive overhead floodlights!</div>
+                    </div>
+                </div>
+
+                <div class="help-card">
+                    <span class="h-icon">🔥</span>
+                    <div>
+                        <div class="h-title">TACTICAL FLARES</div>
+                        <div class="h-desc">Tap <strong>[🔥]</strong> (PC: F / RMB) to cut through dark mist and reveal invisible cloaked Phantoms!</div>
+                    </div>
+                </div>
+
+                <div class="help-card">
+                    <span class="h-icon">🔄</span>
+                    <div>
+                        <div class="h-title">ROUND WEAPON DIAL</div>
+                        <div class="h-desc">Tap the circular weapon button to cycle: <strong>🔫 Carbine &bull; 💥 Shotgun &bull; ⚡ Arc &bull; 🌀 Vortex</strong>.</div>
+                    </div>
+                </div>
+
+                <div class="help-card">
+                    <span class="h-icon">⚡</span>
+                    <div>
+                        <div class="h-title">JET DASH EVASION</div>
+                        <div class="h-desc">Tap <strong>[⚡]</strong> (PC: Shift / Space) to burst away from toxic acid pools and behemoth charges.</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-dismiss-help" class="btn-primary" style="margin-top: 14px; padding: 12px 24px; font-size: 15px;">✕ CLOSE & RESUME GAME</button>
         </div>
     </div>
 
@@ -141,16 +182,6 @@
             <div class="game-subtitle">ZERO HOUR // SECTOR-9 CONTAINMENT BREACH</div>
 
             <div class="mobile-touch-banner">📱 FULL TOUCHSCREEN COMPATIBLE &bull; ROTATE FOR LANDSCAPE 🔄</div>
-
-            <!-- Animated Helpline Simulation Monitor -->
-            <div class="helpline-sim-box">
-                <div class="helpline-sim-header">
-                    <span><span class="live-dot"></span>HELPLINE // TACTICAL SIMULATION</span>
-                    <span>STATUS: ACTIVE RADAR</span>
-                </div>
-                <canvas id="helpline-sim-canvas" width="680" height="110"></canvas>
-                <div id="helpline-ticker" class="helpline-ticker">⚡ TIP 1: THROW FLARES [F / RMB] TO EXPOSE CLOAKED SHADOW PHANTOMS!</div>
-            </div>
 
             <!-- Graphical Controls Badges -->
             <div class="graphic-controls-grid">
@@ -169,46 +200,6 @@
                 <div class="control-badge">
                     <div class="key-icon">[SHIFT] &bull; ⚡</div>
                     <div class="key-desc">EVASION DASH</div>
-                </div>
-            </div>
-
-            <!-- Visual Survival Pillars -->
-            <div class="pillars-row">
-                <div class="pillar-card p1">
-                    <div class="pillar-header">🔦 LIGHT VS SHADOW</div>
-                    <div class="pillar-body">Flashlight & flares cut through black mist and force cloaked Phantoms into view.</div>
-                </div>
-                <div class="pillar-card p2">
-                    <div class="pillar-header">⚡ RESTORE GENERATORS</div>
-                    <div class="pillar-body">Step onto sector power consoles to reboot massive overhead floodlights.</div>
-                </div>
-                <div class="pillar-card p3">
-                    <div class="pillar-header">🧬 UPGRADE & PURGE</div>
-                    <div class="pillar-body">Clear waves to install cybernetic augments like Defense Drones & Bouncing Rounds.</div>
-                </div>
-            </div>
-
-            <!-- Alien Threat Dossier Badges -->
-            <div class="threat-dossier">
-                <div class="alien-badge scuttler">
-                    <span class="a-dot"></span>
-                    <span class="a-name">SCUTTLER</span>
-                    <span class="a-desc">Fast Swarm / Leaper</span>
-                </div>
-                <div class="alien-badge spitter">
-                    <span class="a-dot"></span>
-                    <span class="a-name">SPITTER</span>
-                    <span class="a-desc">Toxic Acid Pools</span>
-                </div>
-                <div class="alien-badge behemoth">
-                    <span class="a-dot"></span>
-                    <span class="a-name">BEHEMOTH</span>
-                    <span class="a-desc">Armored / Charge Stomp</span>
-                </div>
-                <div class="alien-badge phantom">
-                    <span class="a-dot"></span>
-                    <span class="a-name">PHANTOM</span>
-                    <span class="a-desc">Cloaked in Shadows</span>
                 </div>
             </div>
 

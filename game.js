@@ -798,6 +798,33 @@ class Game {
                 toggleFullscreen();
             }, { passive: false });
         }
+
+        // Tactical Help Popup Toggle & Dismiss
+        const helpPopup = document.getElementById('help-popup');
+        const openHelp = () => {
+            if (helpPopup) helpPopup.style.display = 'flex';
+        };
+        const closeHelp = () => {
+            if (helpPopup) helpPopup.style.display = 'none';
+        };
+
+        const helpBtn = document.getElementById('btn-help-toggle');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', openHelp);
+            helpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); openHelp(); }, { passive: false });
+        }
+
+        const closeBtn = document.getElementById('btn-close-help');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeHelp);
+            closeBtn.addEventListener('touchstart', (e) => { e.preventDefault(); closeHelp(); }, { passive: false });
+        }
+
+        const dismissBtn = document.getElementById('btn-dismiss-help');
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', closeHelp);
+            dismissBtn.addEventListener('touchstart', (e) => { e.preventDefault(); closeHelp(); }, { passive: false });
+        }
     }
 
     switchWeapon(weapon) {
@@ -915,17 +942,7 @@ class Game {
         this.waveSpawnTimer = 0;
 
         Sound.playWaveAlarm();
-        this.showTransmission(`SECTOR-9 BREACH ALERT: Wave ${num} incoming! Hostile bio-signatures detected.`);
         this.updateHUD();
-
-        // Dynamic In-Game Helpline Prompts
-        if (num === 1) {
-            this.showInGameHelpline("⚡ HELPLINE: Navigate with [WASD] & Mouse. Follow the glowing beacon to restore power!", 7.0);
-        } else if (num === 2) {
-            this.showInGameHelpline("⚠️ HELPLINE: Acid Spitters detected! Press [SHIFT] or [SPACE] to dash away from toxic pools!", 6.0);
-        } else if (num === 4) {
-            this.showInGameHelpline("🔦 HELPLINE: Cloaked Phantoms incoming! Press [F] or [RMB] to throw flares and break their stealth!", 6.5);
-        }
     }
 
     triggerWaveBreak() {
@@ -996,11 +1013,12 @@ class Game {
 
     showTransmission(text) {
         const elem = document.getElementById('transmission-log');
+        if (!elem) return;
         elem.textContent = text;
         elem.style.opacity = '1';
         clearTimeout(this.transTimeout);
         this.transTimeout = setTimeout(() => {
-            elem.style.opacity = '0';
+            if (elem) elem.style.opacity = '0';
         }, 5000);
     }
 
@@ -1537,11 +1555,22 @@ class Game {
         const activeSlot = document.getElementById(slotMap[p.currentWeapon.id]);
         if (activeSlot) activeSlot.classList.add('active');
 
-        // Update mobile weapon swap button label
-        const mobWeapon = document.getElementById('mob-weapon-text');
-        if (mobWeapon) {
-            const shortNames = { 'CARBINE': 'CARBINE', 'SHOTGUN': 'SHOTGUN', 'ARC': 'ARC', 'SINGULARITY': 'VORTEX' };
-            mobWeapon.textContent = shortNames[p.currentWeapon.id] || p.currentWeapon.id;
+        // Update mobile round weapon button: visual icon & dynamic neon plasma glow
+        const mobIcon = document.getElementById('mob-weapon-icon');
+        const mobBtn = document.getElementById('btn-mob-weapon');
+        const weaponVisuals = {
+            'CARBINE': { icon: '🔫', color: '#00d2ff' },
+            'SHOTGUN': { icon: '💥', color: '#ff7700' },
+            'ARC': { icon: '⚡', color: '#aa44ff' },
+            'SINGULARITY': { icon: '🌀', color: '#ff00aa' }
+        };
+        const curVis = weaponVisuals[p.currentWeapon.id] || { icon: '🔫', color: '#00d2ff' };
+        if (mobIcon) {
+            mobIcon.textContent = curVis.icon;
+        }
+        if (mobBtn) {
+            mobBtn.style.borderColor = curVis.color;
+            mobBtn.style.boxShadow = `0 0 16px ${curVis.color}`;
         }
     }
 

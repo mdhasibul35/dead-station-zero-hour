@@ -253,15 +253,51 @@ html, body {
     color: #00ffff;
 }
 
-/* Controls reminder */
-.controls-hint {
+/* Round Arsenal Hotbar (Desktop) */
+.round-arsenal {
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.round-slot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(10, 16, 22, 0.85);
+    border: 2px solid #233442;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(6px);
+}
+
+.round-slot .w-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.round-slot .w-num {
     position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    color: #4a6375;
-    letter-spacing: 1px;
+    bottom: 2px;
+    font-size: 9px;
+    color: #5d7e99;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.round-slot.active {
+    border-color: #00d2ff;
+    box-shadow: 0 0 16px rgba(0, 210, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Controls reminder (Hidden to preserve screen space) */
+.controls-hint {
+    display: none;
 }
 
 /* Audio Indicator */
@@ -529,43 +565,132 @@ h1.game-title {
     box-shadow: 0 0 35px rgba(0, 210, 255, 0.9);
 }
 
-/* In-game Dynamic Animated Helpline */
-#in-game-helpline {
+/* Top HUD Utility Buttons */
+.hud-top-buttons {
     position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(8, 16, 24, 0.9);
+    top: 130px;
+    right: 28px;
+    display: flex;
+    gap: 8px;
+    z-index: 26;
+    pointer-events: auto;
+}
+
+.hud-top-btn {
+    background: rgba(8, 16, 24, 0.85);
     border: 1px solid #00d2ff;
+    color: #00d2ff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 6px 12px;
     border-radius: 4px;
-    padding: 10px 22px;
-    display: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+}
+
+.hud-top-btn:hover, .hud-top-btn:active {
+    background: #00d2ff;
+    color: #030508;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.7);
+}
+
+/* Tactical Manual Pop-up (Dismissible / Deletable at user will) */
+#help-popup {
+    z-index: 100;
+}
+
+.help-popup-box {
+    max-width: 520px;
+    width: 92%;
+    background: rgba(6, 12, 18, 0.96);
+    border: 2px solid #00d2ff;
+    box-shadow: 0 0 35px rgba(0, 210, 255, 0.4), inset 0 0 20px rgba(0, 210, 255, 0.1);
+    border-radius: 6px;
+    padding: 20px;
+    color: #c0d8ea;
+}
+
+.help-popup-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(0, 210, 255, 0.3);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.help-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.btn-close-popup {
+    background: rgba(255, 51, 85, 0.2);
+    border: 1px solid #ff3355;
+    color: #ff3355;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-close-popup:hover, .btn-close-popup:active {
+    background: #ff3355;
+    color: #ffffff;
+    box-shadow: 0 0 12px #ff3355;
+}
+
+.help-popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.help-card {
+    display: flex;
+    align-items: flex-start;
     gap: 12px;
-    box-shadow: 0 0 25px rgba(0, 210, 255, 0.35);
-    z-index: 30;
-    pointer-events: none;
-    animation: helplinePulse 2s infinite ease-in-out;
+    background: rgba(12, 20, 28, 0.7);
+    border: 1px solid #1f3647;
+    border-left: 3px solid #00d2ff;
+    padding: 10px 14px;
+    border-radius: 4px;
 }
 
-@keyframes helplinePulse {
-    0%, 100% { box-shadow: 0 0 15px rgba(0, 210, 255, 0.3); }
-    50% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.7); }
+.help-card .h-icon {
+    font-size: 22px;
+    line-height: 1.2;
 }
 
-#helpline-icon {
-    font-size: 18px;
-    animation: bounceIcon 1s infinite alternate;
+.help-card .h-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
 }
 
-@keyframes bounceIcon {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-4px); }
-}
-
-#helpline-text {
-    font-size: 13px;
-    color: #e0f4ff;
+.help-card .h-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #9cbccc;
 }
 
 /* Upgrade Cards Modal */
@@ -835,7 +960,7 @@ body.touch-enabled #mobile-controls,
     justify-content: center;
     min-width: 48px;
     height: 48px;
-    padding: 3px;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     font-family: 'Share Tech Mono', monospace;
@@ -851,15 +976,20 @@ body.touch-enabled #mobile-controls,
     filter: brightness(1.35);
 }
 
-.mob-btn .m-icon {
-    font-size: 16px;
-    line-height: 1;
+.round-btn {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 
-.mob-btn .m-lbl {
-    font-size: 8px;
-    letter-spacing: 0.5px;
-    margin-top: 2px;
+.round-btn .m-icon {
+    font-size: 20px;
+    line-height: 1;
 }
 
 .btn-dash {
@@ -883,50 +1013,71 @@ body.touch-enabled #mobile-controls,
     box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
 }
 
-.btn-weapon {
-    border-radius: 24px;
-    min-width: 76px;
-    padding: 0 10px;
-    background: rgba(204, 68, 255, 0.2);
-    border: 2px solid #cc44ff;
-    color: #cc44ff;
-    box-shadow: 0 0 12px rgba(204, 68, 255, 0.35);
+/* ROUND WEAPON CHANGER: Takes very little space, purely visual icon with glowing border */
+.btn-round-weapon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 50%;
+    background: rgba(14, 22, 32, 0.9);
+    border: 2px solid #00d2ff;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(0, 210, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn-weapon .m-lbl {
-    font-size: 9px;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1px;
+.btn-round-weapon .m-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.btn-round-weapon:active {
+    transform: scale(0.9);
 }
 
 /* --------------------------------------------------------------------------
    RESPONSIVE DESIGN FOR SMARTPHONES & TABLETS
    -------------------------------------------------------------------------- */
 @media (max-width: 900px), (pointer: coarse) {
+    /* Hide radar on mobile screens so vitals and score have 100% unobstructed space */
     .radar-container {
-        top: 14px;
-        right: 14px;
-        bottom: auto;
-        left: auto;
-        transform: scale(0.72);
-        transform-origin: top right;
+        display: none !important;
     }
 
     .hud-telemetry {
-        top: 14px;
-        right: 125px;
+        top: 10px;
+        right: 10px;
         text-align: right;
+        padding: 8px 12px;
+        transform: scale(0.85);
+        transform-origin: top right;
+        z-index: 25;
     }
 
     .hud-vitals {
-        top: 14px;
-        left: 14px;
-        transform: scale(0.88);
+        top: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        transform: scale(0.85);
         transform-origin: top left;
+        z-index: 25;
+    }
+
+    .hud-top-buttons {
+        top: 86px;
+        right: 10px;
+        transform: scale(0.85);
+        transform-origin: top right;
+        z-index: 26;
     }
 
     .hud-weapons {
-        display: none; /* Managed by mobile action bar */
+        display: none; /* Managed by mobile round weapon button */
     }
 
     .controls-hint {
@@ -934,21 +1085,17 @@ body.touch-enabled #mobile-controls,
     }
 
     #in-game-helpline {
-        top: 80px;
-        padding: 6px 14px;
-        font-size: 11px;
-        max-width: 90vw;
+        display: none !important;
+    }
+
+    #mobile-action-bar {
+        bottom: 165px;
+        right: 14px;
+        gap: 8px;
     }
 
     .fullscreen-btn {
-        top: auto;
-        bottom: 22px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        font-size: 10px;
-        padding: 5px 12px;
-        opacity: 0.85;
+        display: none;
     }
 }
 
