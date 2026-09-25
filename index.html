@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEAD STATION: Zero Hour // 3D Sci-Fi Horror Thriller</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Three.js 3D Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- 3D Canvas Viewport -->
+    <div id="canvas-container"></div>
+
+    <!-- Atmospheric Overlays -->
+    <div class="crt-overlay"></div>
+    <div id="damage-flash"></div>
+
+    <!-- AUDIO INDICATOR & TRANSMISSION -->
+    <div id="audio-indicator">AUDIO: SYNTH ENGINE ACTIVE [M TO MUTE]</div>
+    <div id="transmission-log">ESTABLISHING EMERGENCY UPLINK TO DEAD STATION...</div>
+
+    <!-- HUD INTERFACE -->
+    <div id="hud">
+        <!-- Vitals -->
+        <div class="hud-vitals">
+            <div class="vital-label">
+                <span>OPERATIVE VITALS</span>
+                <span id="health-val">100 / 100</span>
+            </div>
+            <div class="bar-bg">
+                <div id="health-bar"></div>
+            </div>
+            <div class="vital-stats">
+                <div>WEAPON: <span id="weapon-name">MK-IV CARBINE</span></div>
+                <div>ROUNDS: <span id="ammo-val">30 / 30</span></div>
+                <div>FLARES: <span id="flare-count">4</span></div>
+            </div>
+        </div>
+
+        <!-- Telemetry -->
+        <div class="hud-telemetry">
+            <div class="telemetry-row">
+                SCORE <span class="telemetry-val" id="score-val">0</span>
+            </div>
+            <div class="telemetry-row">
+                OUTPOST WAVE <span class="telemetry-val" id="wave-val">1</span>
+            </div>
+            <div class="telemetry-row">
+                THREAT COMBO <span class="telemetry-val" id="combo-val">x1</span>
+            </div>
+        </div>
+
+        <!-- Motion Tracker Radar -->
+        <div class="radar-container">
+            <canvas id="radar-canvas" width="130" height="130"></canvas>
+            <div class="radar-label">BIOMETRIC TRACKER</div>
+        </div>
+
+        <!-- Arsenal Hotbar -->
+        <div class="hud-weapons">
+            <div class="weapon-slot active" id="slot-1">
+                <span class="key">[1]</span>
+                <span class="w-name">CARBINE</span>
+            </div>
+            <div class="weapon-slot" id="slot-2">
+                <span class="key">[2]</span>
+                <span class="w-name">SHOTGUN</span>
+            </div>
+            <div class="weapon-slot" id="slot-3">
+                <span class="key">[3]</span>
+                <span class="w-name">ARC EMITTER</span>
+            </div>
+            <div class="weapon-slot" id="slot-4">
+                <span class="key">[4]</span>
+                <span class="w-name">VORTEX</span>
+            </div>
+        </div>
+
+        <!-- Controls Reminder -->
+        <div class="controls-hint">
+            [WASD] MOVE &nbsp;|&nbsp; [MOUSE] AIM & FIRE &nbsp;|&nbsp; [SHIFT/SPACE] DASH &nbsp;|&nbsp; [RMB / F] FLARE &nbsp;|&nbsp; [1-4] WEAPONS &nbsp;|&nbsp; [R] RELOAD
+        </div>
+
+        <!-- In-Game Dynamic Animated Helpline Banner -->
+        <div id="in-game-helpline">
+            <div id="helpline-icon">⚡</div>
+            <div id="helpline-text">HELPLINE: [WASD] to Move & Mouse to Aim. Step on Power Terminals to restore light!</div>
+        </div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="modal-overlay">
+        <div class="modal-box">
+            <h1 class="game-title">DEAD STATION</h1>
+            <div class="game-subtitle">ZERO HOUR // SECTOR-9 CONTAINMENT BREACH</div>
+
+            <!-- Animated Helpline Simulation Monitor -->
+            <div class="helpline-sim-box">
+                <div class="helpline-sim-header">
+                    <span><span class="live-dot"></span>HELPLINE // TACTICAL SIMULATION</span>
+                    <span>STATUS: ACTIVE RADAR</span>
+                </div>
+                <canvas id="helpline-sim-canvas" width="680" height="110"></canvas>
+                <div id="helpline-ticker" class="helpline-ticker">⚡ TIP 1: THROW FLARES [F / RMB] TO EXPOSE CLOAKED SHADOW PHANTOMS!</div>
+            </div>
+
+            <!-- Graphical Controls Badges -->
+            <div class="graphic-controls-grid">
+                <div class="control-badge">
+                    <div class="key-icon">W A S D</div>
+                    <div class="key-desc">MOVE OPERATIVE</div>
+                </div>
+                <div class="control-badge">
+                    <div class="key-icon">MOUSE [LMB]</div>
+                    <div class="key-desc">AIM & FIRE</div>
+                </div>
+                <div class="control-badge">
+                    <div class="key-icon">[RMB] / [F]</div>
+                    <div class="key-desc">DEPLOY FLARE</div>
+                </div>
+                <div class="control-badge">
+                    <div class="key-icon">[SHIFT]</div>
+                    <div class="key-desc">EVASION DASH</div>
+                </div>
+            </div>
+
+            <!-- Visual Survival Pillars -->
+            <div class="pillars-row">
+                <div class="pillar-card p1">
+                    <div class="pillar-header">🔦 LIGHT VS SHADOW</div>
+                    <div class="pillar-body">Flashlight & flares cut through black mist and force cloaked Phantoms into view.</div>
+                </div>
+                <div class="pillar-card p2">
+                    <div class="pillar-header">⚡ RESTORE GENERATORS</div>
+                    <div class="pillar-body">Step onto sector power consoles to reboot massive overhead floodlights.</div>
+                </div>
+                <div class="pillar-card p3">
+                    <div class="pillar-header">🧬 UPGRADE & PURGE</div>
+                    <div class="pillar-body">Clear waves to install cybernetic augments like Defense Drones & Bouncing Rounds.</div>
+                </div>
+            </div>
+
+            <!-- Alien Threat Dossier Badges -->
+            <div class="threat-dossier">
+                <div class="alien-badge scuttler">
+                    <span class="a-dot"></span>
+                    <span class="a-name">SCUTTLER</span>
+                    <span class="a-desc">Fast Swarm / Leaper</span>
+                </div>
+                <div class="alien-badge spitter">
+                    <span class="a-dot"></span>
+                    <span class="a-name">SPITTER</span>
+                    <span class="a-desc">Toxic Acid Pools</span>
+                </div>
+                <div class="alien-badge behemoth">
+                    <span class="a-dot"></span>
+                    <span class="a-name">BEHEMOTH</span>
+                    <span class="a-desc">Armored / Charge Stomp</span>
+                </div>
+                <div class="alien-badge phantom">
+                    <span class="a-dot"></span>
+                    <span class="a-name">PHANTOM</span>
+                    <span class="a-desc">Cloaked in Shadows</span>
+                </div>
+            </div>
+
+            <button id="start-btn" class="btn-primary">START GAME</button>
+        </div>
+    </div>
+
+    <!-- UPGRADE MODAL -->
+    <div id="upgrade-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h1 class="game-title" style="font-size: 26px;">SECTOR CLEARED</h1>
+            <div class="game-subtitle">SELECT SYSTEM AUGMENTATION PROTOCOL</div>
+            <div id="upgrade-cards" class="upgrade-cards-container"></div>
+        </div>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over-screen" class="modal-overlay">
+        <div class="modal-box game-over-box">
+            <h1 class="game-title">SIGNAL LOST</h1>
+            <div class="game-subtitle">OPERATIVE TERMINATED BY BIO-THREAT</div>
+
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <div class="num" id="final-score">0</div>
+                    <div class="lbl">TOTAL SCORE</div>
+                </div>
+                <div class="stat-item">
+                    <div class="num" id="final-wave">1</div>
+                    <div class="lbl">WAVES SURVIVED</div>
+                </div>
+                <div class="stat-item">
+                    <div class="num" id="final-kills">0</div>
+                    <div class="lbl">ALIENS PURGED</div>
+                </div>
+            </div>
+
+            <button id="restart-btn" class="btn-primary" style="background: linear-gradient(135deg, #cc1133, #ff2255); color: #fff;">RE-ENGAGE PROTOCOL</button>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/weapons.js"></script>
+    <script src="js/aliens.js"></script>
+    <script src="js/environment.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
