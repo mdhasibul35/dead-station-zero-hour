@@ -659,6 +659,29 @@ class Game {
             }
         });
 
+        // Clickable & Touchable Reload Buttons (HUD & Weapon Bar)
+        const reloadTrigger = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            Sound.init();
+            Sound.resume();
+            if (this.gameState === 'PLAYING') this.reloadCurrentWeapon();
+        };
+
+        const slotReload = document.getElementById('slot-reload');
+        if (slotReload) {
+            slotReload.addEventListener('click', reloadTrigger);
+            slotReload.addEventListener('touchstart', reloadTrigger, { passive: false });
+        }
+
+        const hudReload = document.getElementById('btn-hud-reload');
+        if (hudReload) {
+            hudReload.addEventListener('click', reloadTrigger);
+            hudReload.addEventListener('touchstart', reloadTrigger, { passive: false });
+        }
+
         // UI Buttons
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
@@ -1910,6 +1933,16 @@ class Game {
             mobBtn.style.borderColor = curVis.color;
             mobBtn.style.boxShadow = `0 0 16px ${curVis.color}`;
         }
+
+        // Toggle visual empty-ammo pulse on reload buttons when clip reaches 0
+        const isOutOfAmmo = curAmmo <= 0;
+        ['slot-reload', 'btn-hud-reload', 'btn-mob-reload'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                if (isOutOfAmmo) btn.classList.add('ammo-empty');
+                else btn.classList.remove('ammo-empty');
+            }
+        });
     }
 
     // ------------------------------------------------------------------------

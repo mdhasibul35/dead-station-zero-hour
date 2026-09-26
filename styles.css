@@ -117,7 +117,8 @@ html, body {
 
 .vital-stats {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 16px;
     font-size: 13px;
     color: #8bb1cf;
 }
@@ -125,6 +126,73 @@ html, body {
 .vital-stats span {
     color: #ffffff;
     font-weight: bold;
+}
+
+.rounds-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-hud-reload {
+    background: rgba(57, 255, 20, 0.15);
+    border: 1px solid #39ff14;
+    color: #39ff14;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.btn-hud-reload:hover, .btn-hud-reload:active {
+    background: #39ff14;
+    color: #030a10;
+    box-shadow: 0 0 14px #39ff14;
+    transform: scale(1.05);
+}
+
+.reload-slot {
+    border-color: rgba(57, 255, 20, 0.55) !important;
+    background: rgba(10, 26, 16, 0.85) !important;
+}
+
+.reload-slot .w-icon {
+    font-size: 18px;
+}
+
+.reload-slot .w-num {
+    display: block !important;
+    color: #39ff14 !important;
+    font-weight: bold;
+}
+
+.reload-slot:hover, .reload-slot:active, .reload-slot.active-reload {
+    border-color: #39ff14 !important;
+    box-shadow: 0 0 16px rgba(57, 255, 20, 0.7) !important;
+    transform: scale(1.08) !important;
+}
+
+.ammo-empty {
+    animation: reloadAlertPulse 0.55s infinite alternate !important;
+}
+
+@keyframes reloadAlertPulse {
+    0% {
+        border-color: #ff3366 !important;
+        box-shadow: 0 0 10px #ff3366 !important;
+        transform: scale(1.0);
+    }
+    100% {
+        border-color: #39ff14 !important;
+        box-shadow: 0 0 22px #39ff14 !important;
+        transform: scale(1.12);
+    }
 }
 
 /* Top Right: Mission Telemetry & Threat Multiplier */

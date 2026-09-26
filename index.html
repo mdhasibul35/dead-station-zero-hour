@@ -31,7 +31,10 @@
                 <div id="health-bar"></div>
             </div>
             <div class="vital-stats">
-                <div>ROUNDS: <span id="ammo-val">30 / 30</span></div>
+                <div class="rounds-box">
+                    ROUNDS: <span id="ammo-val">30 / 30</span>
+                    <button id="btn-hud-reload" class="btn-hud-reload" title="Reload Weapon [R]">🔄 RELOAD [R]</button>
+                </div>
                 <div>FLARES: <span id="flare-count">4</span></div>
             </div>
         </div>
@@ -61,7 +64,7 @@
             <div class="radar-label">BIOMETRIC TRACKER</div>
         </div>
 
-        <!-- Desktop Arsenal Hotbar (Round Visual Buttons) -->
+        <!-- Desktop & Mobile Arsenal Hotbar (Round Visual Buttons + Reload Button) -->
         <div class="hud-weapons round-arsenal">
             <div class="round-slot active" id="slot-1" title="Carbine [1]">
                 <span class="w-icon">🔫</span>
@@ -78,6 +81,10 @@
             <div class="round-slot" id="slot-4" title="Vortex [4]">
                 <span class="w-icon">🌀</span>
                 <span class="w-num">4</span>
+            </div>
+            <div class="round-slot reload-slot" id="slot-reload" title="Reload Weapon [R]">
+                <span class="w-icon">🔄</span>
+                <span class="w-num">R</span>
             </div>
         </div>
 
