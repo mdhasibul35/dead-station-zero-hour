@@ -1307,11 +1307,16 @@ body.touch-enabled #mobile-controls {
     }
 }
 
-/* Optimized for phone portrait orientation: 4 guns above left stick, actions in 2x2 grid at bottom right */
+/* Optimized for phone portrait orientation: Raised joystick, lifted 2x2 action cluster */
 @media (max-width: 600px) and (orientation: portrait) {
+    #stick-move-zone {
+        bottom: 85px;
+        left: 36px;
+    }
+
     .hud-weapons {
-        bottom: 170px;
-        left: 14px;
+        bottom: 240px;
+        left: 28px;
         transform: none;
         gap: 6px;
     }
@@ -1327,28 +1332,28 @@ body.touch-enabled #mobile-controls {
     }
 
     #mobile-action-bar {
-        bottom: 18px;
-        right: 14px;
+        bottom: 85px;
+        right: 18px;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        max-width: 120px;
+        gap: 8px;
+        max-width: 130px;
     }
 
     .round-btn {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
     }
 
     .btn-fire {
-        width: 52px;
-        height: 52px;
-        min-width: 52px;
+        width: 58px;
+        height: 58px;
+        min-width: 58px;
     }
 
     .round-btn .m-icon {
-        font-size: 18px;
+        font-size: 20px;
     }
 }
 
