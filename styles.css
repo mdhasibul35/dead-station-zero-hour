@@ -331,44 +331,67 @@ html, body {
     color: #00ffff;
 }
 
-/* Round Arsenal Hotbar (Desktop) */
+/* Tactical Weapon Arsenal Dock (Desktop) */
 .round-arsenal {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
+    background: rgba(6, 14, 22, 0.85);
+    border: 1px solid rgba(0, 210, 255, 0.35);
+    padding: 6px 12px;
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(0, 210, 255, 0.08);
     pointer-events: auto;
 }
 
 .round-slot {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    background: rgba(10, 16, 22, 0.85);
-    border: 2px solid #233442;
+    background: radial-gradient(circle, rgba(16, 26, 36, 0.95) 0%, rgba(6, 12, 18, 0.95) 100%);
+    border: 1.5px solid rgba(70, 110, 140, 0.45);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
     backdrop-filter: blur(6px);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 .round-slot .w-icon {
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1;
+    transition: transform 0.2s ease;
 }
 
 .round-slot .w-num {
-    position: absolute;
-    bottom: 2px;
     font-size: 9px;
     color: #5d7e99;
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: 1px;
+}
+
+.round-slot:hover {
+    border-color: rgba(0, 210, 255, 0.7);
+    transform: translateY(-2px) scale(1.05);
 }
 
 .round-slot.active {
-    transform: translateY(-2px) scale(1.08);
+    transform: translateY(-2px) scale(1.1);
+}
+
+.round-slot.active .w-num {
+    color: #ffffff;
+    font-weight: 900;
 }
 
 #slot-1.active {
@@ -1355,23 +1378,30 @@ body.touch-enabled #mobile-controls {
         gap: 8px;
         z-index: 90;
         pointer-events: auto;
+        background: rgba(6, 14, 22, 0.85);
+        border: 1px solid rgba(0, 210, 255, 0.35);
+        padding: 4px 8px;
+        border-radius: 26px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 210, 255, 0.15);
     }
 
     .round-slot {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
         background: rgba(8, 14, 20, 0.9);
         border: 2px solid #233442;
     }
 
     .round-slot .w-icon {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .round-slot .w-num {
         display: block !important;
-        font-size: 9px;
+        font-size: 8.5px;
         color: #7b9eb8;
         line-height: 1;
         margin-top: 1px;
@@ -1408,20 +1438,42 @@ body.touch-enabled #mobile-controls {
     }
 
     .hud-weapons {
-        bottom: 240px;
-        left: 28px;
-        transform: none;
+        position: absolute;
+        bottom: 14px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        display: flex !important;
         gap: 6px;
+        z-index: 90;
+        pointer-events: auto;
+        background: rgba(6, 14, 22, 0.85);
+        border: 1px solid rgba(0, 210, 255, 0.35);
+        padding: 4px 8px;
+        border-radius: 24px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 210, 255, 0.15);
     }
 
     .round-slot {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        background: rgba(10, 18, 28, 0.9);
+        border: 1.5px solid #233442;
     }
 
     .round-slot .w-icon {
-        font-size: 18px;
+        font-size: 16px;
+    }
+
+    .round-slot .w-num {
+        display: block !important;
+        font-size: 8.5px;
+        color: #7b9eb8;
+        line-height: 1;
+        margin-top: 1px;
     }
 
     #mobile-action-bar {

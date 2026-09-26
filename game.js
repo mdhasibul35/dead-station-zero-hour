@@ -661,29 +661,7 @@ class Game {
             }
         });
 
-        // Clickable & Touchable Reload Buttons (HUD Vitals & Weapon Bar)
-        const bindReloadButton = (el) => {
-            if (!el) return;
-            let lastTrigger = 0;
-            const trigger = (e) => {
-                const now = Date.now();
-                if (now - lastTrigger < 250) return;
-                lastTrigger = now;
-                if (e) {
-                    if (e.cancelable) e.preventDefault();
-                    e.stopPropagation();
-                }
-                Sound.init();
-                Sound.resume();
-                if (this.gameState === 'PLAYING') this.reloadCurrentWeapon();
-            };
-            el.addEventListener('click', trigger);
-            el.addEventListener('touchstart', trigger, { passive: false });
-            el.addEventListener('pointerdown', trigger);
-        };
 
-        bindReloadButton(document.getElementById('slot-reload'));
-        bindReloadButton(document.getElementById('btn-hud-reload'));
 
         // UI Buttons
         const startBtn = document.getElementById('start-btn');
@@ -765,12 +743,10 @@ class Game {
                 if (target && (
                     target.closest('.mob-btn') || 
                     target.closest('.round-slot') || 
-                    target.closest('.reload-slot') || 
                     target.closest('.hud-weapons') || 
                     target.closest('.hud-top-btn') || 
                     target.closest('.hud-top-buttons') || 
                     target.closest('.hud-vitals') || 
-                    target.closest('.btn-hud-reload') || 
                     target.closest('.radar-container') || 
                     target.closest('.fullscreen-btn') || 
                     target.closest('#help-popup') || 
@@ -779,18 +755,32 @@ class Game {
                     continue;
                 }
 
-                // Left Half: Movement Virtual Stick
-                if (touch.clientX < window.innerWidth * 0.45) {
+                // Left Half: Movement Virtual Stick (Fixed Base - NEVER displaced)
+                if (touch.clientX < window.innerWidth * 0.48) {
                     if (moveTouchId === null) {
                         moveTouchId = touch.identifier;
-                        moveCenter = { x: touch.clientX, y: touch.clientY };
+                        // Always calculate offset from the rock-solid fixed center of moveBase
                         if (moveBase) {
-                            moveBase.style.position = 'fixed';
-                            moveBase.style.left = (touch.clientX - 66) + 'px';
-                            moveBase.style.top = (touch.clientY - 66) + 'px';
-                            moveBase.style.opacity = '1';
+                            const rect = moveBase.getBoundingClientRect();
+                            moveCenter = {
+                                x: rect.left + rect.width / 2,
+                                y: rect.top + rect.height / 2
+                            };
+                        } else {
+                            moveCenter = { x: touch.clientX, y: touch.clientY };
                         }
-                        if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
+
+                        let dx = touch.clientX - moveCenter.x;
+                        let dy = touch.clientY - moveCenter.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist > maxRadius) {
+                            dx = (dx / dist) * maxRadius;
+                            dy = (dy / dist) * maxRadius;
+                        }
+                        if (moveKnob) moveKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+                        this.joystickMove.x = dx / maxRadius;
+                        this.joystickMove.y = dy / maxRadius;
+                        this.joystickMove.active = dist > 5;
                     }
                 }
                 // Right Half: Screen Pressing as Instant Aim & Fire
@@ -872,12 +862,6 @@ class Game {
                     this.joystickMove.y = 0;
                     this.joystickMove.active = false;
                     if (moveKnob) moveKnob.style.transform = 'translate(0px, 0px)';
-                    if (moveBase) {
-                        moveBase.style.position = '';
-                        moveBase.style.left = '';
-                        moveBase.style.top = '';
-                        moveBase.style.opacity = '';
-                    }
                 } else if (touch.identifier === aimTouchId) {
                     aimTouchId = null;
                     this.isScreenFiring = false;
@@ -885,12 +869,6 @@ class Game {
                     this.joystickAim.y = 0;
                     this.joystickAim.active = false;
                     if (aimKnob) aimKnob.style.transform = 'translate(0px, 0px)';
-                    if (aimBase) {
-                        aimBase.style.position = '';
-                        aimBase.style.left = '';
-                        aimBase.style.top = '';
-                        aimBase.style.opacity = '';
-                    }
                 }
             }
 
@@ -1120,14 +1098,12 @@ class Game {
         }
         this.updateHUD();
 
-        // Visual flash & rotation feedback on all Reload buttons (HUD vitals, round arsenal, mobile action bar)
-        ['slot-reload', 'btn-hud-reload', 'btn-mob-reload'].forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                btn.classList.add('active-reload');
-                setTimeout(() => btn.classList.remove('active-reload'), 350);
-            }
-        });
+        // Visual flash & rotation feedback on mobile reload button
+        const rBtn = document.getElementById('btn-mob-reload');
+        if (rBtn) {
+            rBtn.classList.add('active-reload');
+            setTimeout(() => rBtn.classList.remove('active-reload'), 350);
+        }
     }
 
     fireWeaponMobileAuto() {
@@ -1948,15 +1924,13 @@ class Game {
             mobBtn.style.boxShadow = `0 0 16px ${curVis.color}`;
         }
 
-        // Toggle visual empty-ammo pulse on reload buttons when clip reaches 0
+        // Toggle visual empty-ammo pulse on mobile reload button when clip reaches 0
         const isOutOfAmmo = curAmmo <= 0;
-        ['slot-reload', 'btn-hud-reload', 'btn-mob-reload'].forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                if (isOutOfAmmo) btn.classList.add('ammo-empty');
-                else btn.classList.remove('ammo-empty');
-            }
-        });
+        const rBtn = document.getElementById('btn-mob-reload');
+        if (rBtn) {
+            if (isOutOfAmmo) rBtn.classList.add('ammo-empty');
+            else rBtn.classList.remove('ammo-empty');
+        }
     }
 
     // ------------------------------------------------------------------------
