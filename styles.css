@@ -1412,7 +1412,7 @@ body.touch-enabled #mobile-controls {
         margin-top: 1px;
     }
 
-    #btn-mob-weapon {
+    #btn-mob-weapon, .reload-slot {
         display: none !important;
     }
 
@@ -1479,6 +1479,10 @@ body.touch-enabled #mobile-controls {
         color: #7b9eb8;
         line-height: 1;
         margin-top: 1px;
+    }
+
+    .reload-slot {
+        display: none !important;
     }
 
     #mobile-action-bar {

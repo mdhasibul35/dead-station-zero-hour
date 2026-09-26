@@ -659,7 +659,17 @@ class Game {
             }
         });
 
-
+        // Clickable Reload Button on PC Hotbar
+        const slotReload = document.getElementById('slot-reload');
+        if (slotReload) {
+            slotReload.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                Sound.init();
+                Sound.resume();
+                if (this.gameState === 'PLAYING') this.reloadCurrentWeapon();
+            });
+        }
 
         // UI Buttons
         const startBtn = document.getElementById('start-btn');
@@ -753,23 +763,20 @@ class Game {
                     continue;
                 }
 
-                // Left Half: Movement Virtual Stick (Fixed Base - NEVER displaced)
-                if (touch.clientX < window.innerWidth * 0.48) {
-                    if (moveTouchId === null) {
+                // Check if this touch is on the movement virtual stick (fixed base)
+                let isJoystickTouch = false;
+                if (moveBase) {
+                    const rect = moveBase.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+                    const distToStick = Math.hypot(touch.clientX - cx, touch.clientY - cy);
+                    // If touching on or within the joystick base (radius ~75px)
+                    if (distToStick < 75 && moveTouchId === null) {
+                        isJoystickTouch = true;
                         moveTouchId = touch.identifier;
-                        // Always calculate offset from the rock-solid fixed center of moveBase
-                        if (moveBase) {
-                            const rect = moveBase.getBoundingClientRect();
-                            moveCenter = {
-                                x: rect.left + rect.width / 2,
-                                y: rect.top + rect.height / 2
-                            };
-                        } else {
-                            moveCenter = { x: touch.clientX, y: touch.clientY };
-                        }
-
-                        let dx = touch.clientX - moveCenter.x;
-                        let dy = touch.clientY - moveCenter.y;
+                        moveCenter = { x: cx, y: cy };
+                        let dx = touch.clientX - cx;
+                        let dy = touch.clientY - cy;
                         const dist = Math.hypot(dx, dy);
                         if (dist > maxRadius) {
                             dx = (dx / dist) * maxRadius;
@@ -781,32 +788,32 @@ class Game {
                         this.joystickMove.active = dist > 5;
                     }
                 }
-                // Right Half: Screen Pressing as Instant Aim & Fire
-                else {
-                    if (aimTouchId === null) {
-                        aimTouchId = touch.identifier;
-                        this.isScreenFiring = true;
-                        this.screenTouchAim.x = (touch.clientX / window.innerWidth) * 2 - 1;
-                        this.screenTouchAim.y = -(touch.clientY / window.innerHeight) * 2 + 1;
 
-                        // Immediately raycast to ground plane and rotate operative
-                        this.raycaster.setFromCamera(this.screenTouchAim, this.camera);
-                        const hit = new THREE.Vector3();
-                        if (this.raycaster.ray.intersectPlane(this.groundPlane, hit)) {
-                            this.mouseWorld.copy(hit);
-                            const toHit = new THREE.Vector3().subVectors(hit, this.player.mesh.position);
-                            toHit.y = 0;
-                            if (toHit.lengthSq() > 0.01) {
-                                this.player.mesh.rotation.y = Math.atan2(toHit.x, toHit.z);
-                            }
-                        }
+                // If not touching the movement joystick: Screen Touch = INSTANT 360° AIM & FIRE!
+                // Works anywhere on the screen (left, right, top, bottom - all 360 degrees around operative)
+                if (!isJoystickTouch && aimTouchId === null) {
+                    aimTouchId = touch.identifier;
+                    this.isScreenFiring = true;
+                    this.screenTouchAim.x = (touch.clientX / window.innerWidth) * 2 - 1;
+                    this.screenTouchAim.y = -(touch.clientY / window.innerHeight) * 2 + 1;
 
-                        // Fire immediately on touch contact
-                        if (this.player.ammo[this.player.currentWeapon.id] <= 0) {
-                            this.reloadCurrentWeapon();
-                        } else {
-                            this.fireWeapon();
+                    // Immediately raycast to ground plane and rotate operative
+                    this.raycaster.setFromCamera(this.screenTouchAim, this.camera);
+                    const hit = new THREE.Vector3();
+                    if (this.raycaster.ray.intersectPlane(this.groundPlane, hit)) {
+                        this.mouseWorld.copy(hit);
+                        const toHit = new THREE.Vector3().subVectors(hit, this.player.mesh.position);
+                        toHit.y = 0;
+                        if (toHit.lengthSq() > 0.01) {
+                            this.player.mesh.rotation.y = Math.atan2(toHit.x, toHit.z);
                         }
+                    }
+
+                    // Fire immediately on touch contact
+                    if (this.player.ammo[this.player.currentWeapon.id] <= 0) {
+                        this.reloadCurrentWeapon();
+                    } else {
+                        this.fireWeapon();
                     }
                 }
             }
@@ -1096,12 +1103,14 @@ class Game {
         }
         this.updateHUD();
 
-        // Visual flash & rotation feedback on mobile reload button
-        const rBtn = document.getElementById('btn-mob-reload');
-        if (rBtn) {
-            rBtn.classList.add('active-reload');
-            setTimeout(() => rBtn.classList.remove('active-reload'), 350);
-        }
+        // Visual flash & rotation feedback on reload buttons
+        ['slot-reload', 'btn-mob-reload'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.classList.add('active-reload');
+                setTimeout(() => btn.classList.remove('active-reload'), 350);
+            }
+        });
     }
 
     fireWeaponMobileAuto() {
