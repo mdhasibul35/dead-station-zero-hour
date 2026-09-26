@@ -585,6 +585,25 @@ class SoundManager {
         });
     }
 
+    playReload() {
+        if (!this.initialized || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        // Crisp dual metallic bolt slide & lock
+        [0, 0.11].forEach((offset, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(idx === 0 ? 320 : 540, now + offset);
+            osc.frequency.exponentialRampToValueAtTime(idx === 0 ? 180 : 860, now + offset + 0.08);
+            gain.gain.setValueAtTime(0.35, now + offset);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.09);
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+            osc.start(now + offset);
+            osc.stop(now + offset + 0.1);
+        });
+    }
+
     playWaveAlarm() {
         if (!this.initialized || this.isMuted) return;
         const now = this.ctx.currentTime;

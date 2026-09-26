@@ -86,6 +86,8 @@ html, body {
     padding: 14px 20px;
     backdrop-filter: blur(8px);
     box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
+    pointer-events: auto !important;
+    z-index: 95;
 }
 
 .vital-label {
@@ -129,32 +131,40 @@ html, body {
 }
 
 .rounds-box {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+    pointer-events: auto !important;
 }
 
 .btn-hud-reload {
-    background: rgba(57, 255, 20, 0.15);
-    border: 1px solid #39ff14;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: rgba(57, 255, 20, 0.2);
+    border: 1.5px solid #39ff14;
     color: #39ff14;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    padding: 2px 8px;
-    border-radius: 3px;
+    font-size: 15px;
+    line-height: 1;
     cursor: pointer;
-    transition: all 0.2s ease;
+    pointer-events: auto !important;
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
     user-select: none;
     touch-action: manipulation;
+    margin-left: 4px;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.35);
+    z-index: 96;
 }
 
-.btn-hud-reload:hover, .btn-hud-reload:active {
+.btn-hud-reload:hover, .btn-hud-reload:active, .btn-hud-reload.active-reload {
     background: #39ff14;
     color: #030a10;
-    box-shadow: 0 0 14px #39ff14;
-    transform: scale(1.05);
+    box-shadow: 0 0 16px #39ff14;
+    transform: scale(1.18) rotate(180deg);
 }
 
 .reload-slot {
@@ -1100,20 +1110,19 @@ body.touch-enabled #mobile-controls {
     border: 2px solid #39ff14;
     color: #39ff14;
     box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
+    pointer-events: auto !important;
 }
 
 .btn-reload .m-icon {
-    font-size: 16px;
+    font-size: 20px;
     line-height: 1;
 }
 
-.btn-reload .m-lbl {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 8px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    color: #39ff14;
-    margin-top: 1px;
+.btn-reload:active, .btn-reload.active-reload {
+    background: #39ff14 !important;
+    color: #030a10 !important;
+    box-shadow: 0 0 20px #39ff14 !important;
+    transform: scale(1.15) rotate(180deg) !important;
 }
 
 .btn-dash .m-lbl {
@@ -1243,8 +1252,9 @@ body.touch-enabled #mobile-controls {
         backdrop-filter: blur(6px);
         box-shadow: 0 0 14px rgba(0, 210, 255, 0.15);
         transform: none;
-        z-index: 25;
-        max-width: 160px;
+        z-index: 95 !important;
+        pointer-events: auto !important;
+        max-width: 180px;
     }
 
     .vital-label {
@@ -1283,6 +1293,21 @@ body.touch-enabled #mobile-controls {
         color: #ffffff;
         font-weight: bold;
         font-size: 8.5px;
+    }
+
+    .rounds-box {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        pointer-events: auto !important;
+    }
+
+    .btn-hud-reload {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        font-size: 13px;
+        pointer-events: auto !important;
     }
 
     /* MISSION TELEMETRY: Top Right */

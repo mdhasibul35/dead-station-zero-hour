@@ -561,7 +561,9 @@ class Game {
                 target.closest('.hud-top-btn') ||
                 target.closest('.round-arsenal') ||
                 target.closest('.round-slot') ||
+                target.closest('.reload-slot') ||
                 target.closest('.hud-vitals') ||
+                target.closest('.btn-hud-reload') ||
                 target.closest('.radar-container') ||
                 target.closest('.modal-overlay') ||
                 target.closest('#help-popup') ||
@@ -659,28 +661,29 @@ class Game {
             }
         });
 
-        // Clickable & Touchable Reload Buttons (HUD & Weapon Bar)
-        const reloadTrigger = (e) => {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            Sound.init();
-            Sound.resume();
-            if (this.gameState === 'PLAYING') this.reloadCurrentWeapon();
+        // Clickable & Touchable Reload Buttons (HUD Vitals & Weapon Bar)
+        const bindReloadButton = (el) => {
+            if (!el) return;
+            let lastTrigger = 0;
+            const trigger = (e) => {
+                const now = Date.now();
+                if (now - lastTrigger < 250) return;
+                lastTrigger = now;
+                if (e) {
+                    if (e.cancelable) e.preventDefault();
+                    e.stopPropagation();
+                }
+                Sound.init();
+                Sound.resume();
+                if (this.gameState === 'PLAYING') this.reloadCurrentWeapon();
+            };
+            el.addEventListener('click', trigger);
+            el.addEventListener('touchstart', trigger, { passive: false });
+            el.addEventListener('pointerdown', trigger);
         };
 
-        const slotReload = document.getElementById('slot-reload');
-        if (slotReload) {
-            slotReload.addEventListener('click', reloadTrigger);
-            slotReload.addEventListener('touchstart', reloadTrigger, { passive: false });
-        }
-
-        const hudReload = document.getElementById('btn-hud-reload');
-        if (hudReload) {
-            hudReload.addEventListener('click', reloadTrigger);
-            hudReload.addEventListener('touchstart', reloadTrigger, { passive: false });
-        }
+        bindReloadButton(document.getElementById('slot-reload'));
+        bindReloadButton(document.getElementById('btn-hud-reload'));
 
         // UI Buttons
         const startBtn = document.getElementById('start-btn');
@@ -762,10 +765,12 @@ class Game {
                 if (target && (
                     target.closest('.mob-btn') || 
                     target.closest('.round-slot') || 
+                    target.closest('.reload-slot') || 
                     target.closest('.hud-weapons') || 
                     target.closest('.hud-top-btn') || 
                     target.closest('.hud-top-buttons') || 
                     target.closest('.hud-vitals') || 
+                    target.closest('.btn-hud-reload') || 
                     target.closest('.radar-container') || 
                     target.closest('.fullscreen-btn') || 
                     target.closest('#help-popup') || 
@@ -928,20 +933,22 @@ class Game {
         const bindTouchAction = (id, callback) => {
             const btn = document.getElementById(id);
             if (!btn) return;
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            let lastTrigger = 0;
+            const trigger = (e) => {
+                const now = Date.now();
+                if (now - lastTrigger < 250) return;
+                lastTrigger = now;
+                if (e) {
+                    if (e.cancelable) e.preventDefault();
+                    e.stopPropagation();
+                }
                 Sound.init();
                 Sound.resume();
                 callback();
-            }, { passive: false });
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                Sound.init();
-                Sound.resume();
-                callback();
-            });
+            };
+            btn.addEventListener('touchstart', trigger, { passive: false });
+            btn.addEventListener('pointerdown', trigger);
+            btn.addEventListener('click', trigger);
         };
 
         bindTouchAction('btn-mob-dash', () => this.triggerDash());
@@ -1102,18 +1109,25 @@ class Game {
     }
 
     reloadCurrentWeapon() {
+        if (this.gameState !== 'PLAYING') return;
         const p = this.player;
         const maxCap = p.currentWeapon.ammoCapacity;
         p.ammo[p.currentWeapon.id] = maxCap;
-        Sound.playUpgradeSelect();
+        if (typeof Sound.playReload === 'function') {
+            Sound.playReload();
+        } else {
+            Sound.playUpgradeSelect();
+        }
         this.updateHUD();
 
-        // Visual flash feedback on Reload button
-        const rBtn = document.getElementById('btn-mob-reload');
-        if (rBtn) {
-            rBtn.classList.add('active-reload');
-            setTimeout(() => rBtn.classList.remove('active-reload'), 350);
-        }
+        // Visual flash & rotation feedback on all Reload buttons (HUD vitals, round arsenal, mobile action bar)
+        ['slot-reload', 'btn-hud-reload', 'btn-mob-reload'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.classList.add('active-reload');
+                setTimeout(() => btn.classList.remove('active-reload'), 350);
+            }
+        });
     }
 
     fireWeaponMobileAuto() {
